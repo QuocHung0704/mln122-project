@@ -9,4 +9,4 @@ const MultipleChoice = () => {
     ) 
 }
 
-export default MultipleChoice
+export default MultipleChoice;
