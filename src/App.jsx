@@ -12,9 +12,9 @@ function App() {
   const renderMainContent = () => {
     switch (activeSection) {
       case "quiz":
-        return <QuizGame />;
-      case "section2":
         return <MultipleChoice />;
+      case "section2":
+        return <PlaceholderSection title="Mục 2" />;
       case "section3":
         return <PlaceholderSection title="Mục 3" />;
       default:
