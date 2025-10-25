@@ -1,26 +1,39 @@
-import { useState } from 'react'
-import './App.css'
+import { useState } from "react";
+import "./App.css";
+import QuizGame from "./component/QuizGame";
+import MultipleChoice from "./page/MultipleChoice";
+import PlaceholderSection from "./component/PlaceholderSection";
+import Header from "./component/header";
+import Footer from "./component/footer";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [activeSection, setActiveSection] = useState("quiz"); 
 
+  const renderMainContent = () => {
+    switch (activeSection) {
+      case "quiz":
+        return <QuizGame />;
+      case "section2":
+        return <MultipleChoice />;
+      case "section3":
+        return <PlaceholderSection title="Mục 3" />;
+      default:
+        return <QuizGame />;
+    }
+  };
   return (
-    <>
-      <div className="min-h-screen bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-2xl">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">
-          Hello Tailwind CSS!
-        </h1>
-        <p className="text-gray-600">
-          React + Tailwind đã sẵn sàng!
-        </p>
-        <button className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300">
-          Click me
-        </button>
-      </div>
+    <div className="flex flex-col min-h-screen bg-stone-100 text-stone-900 font-sans">
+      <Header
+        activeSection={activeSection}
+        setActiveSection={setActiveSection}
+      />
+
+      <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        {renderMainContent()}
+      </main>
+      <Footer />
     </div>
-    </>
-  )
+  );
 }
 
-export default App
+export default App;
