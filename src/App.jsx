@@ -1,10 +1,10 @@
 import { useState } from "react";
 import "./App.css";
-import QuizGame from "./component/QuizGame";
 import MultipleChoice from "./page/MultipleChoice";
-import PlaceholderSection from "./component/PlaceholderSection";
-import Header from "./component/header";
-import Footer from "./component/footer";
+import QuizGame from "./components/Footer";
+import PlaceholderSection from "./components/PlaceholderSection";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
 
 function App() {
   const [activeSection, setActiveSection] = useState("quiz"); 

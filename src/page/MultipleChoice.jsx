@@ -1,5 +1,5 @@
 import React from "react";
-import QuizGame from "../component/QuizGame";
+import QuizGame from "../components/QuizGame";
 
 const MultipleChoice = () => {
     return (
@@ -9,4 +9,4 @@ const MultipleChoice = () => {
     ) 
 }
 
-export default MultipleChoice
+export default MultipleChoice;
