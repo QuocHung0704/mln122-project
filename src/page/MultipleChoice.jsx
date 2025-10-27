@@ -1,5 +1,5 @@
 import React from "react";
-import QuizGame from "../components/QuizGame";
+import QuizGame from "../components/Section1/QuizGame";
 
 const MultipleChoice = () => {
     return (
