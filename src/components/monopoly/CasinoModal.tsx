@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Square, Player } from '../../type';
+import React, { useEffect, useState } from 'react';
+import { Square, Player } from '../../types/type';
 
 interface CasinoModalProps {
     square: Square;
@@ -28,6 +28,13 @@ const CasinoModal: React.FC<CasinoModalProps> = ({ square, player, jackpot, onCl
     const [winnings, setWinnings] = useState(0);
     const [jackpotWon, setJackpotWon] = useState(false);
     const [resultMessage, setResultMessage] = useState('');
+
+    useEffect(() => {
+        const minBet = BET_CONFIG.safe.cost;
+        if (player.chips < minBet) {
+            onClose(null);
+        }
+    }, [player.chips, onClose]);
 
     const canAfford = (type: BetType) => player.chips >= BET_CONFIG[type].cost;
 

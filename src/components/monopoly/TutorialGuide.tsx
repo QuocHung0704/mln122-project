@@ -1,5 +1,5 @@
 import React, { useState, useLayoutEffect } from 'react';
-import { TUTORIAL_STEPS } from '../../TutorialStep';
+import { TUTORIAL_STEPS } from '../../config/TutorialStep';
 
 interface TutorialGuideProps {
     step: number;

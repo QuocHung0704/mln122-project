@@ -1,6 +1,6 @@
 import React from 'react';
-import { Player } from '../../type';
-import { BOARD_SQUARES } from '../../utils/constant';
+import { Player } from '../../types/type';
+import { BOARD_SQUARES } from '../../config/constant';
 import SquareIcon from './SquareIcon';
 import PawnIcon from './PawnIcon';
 

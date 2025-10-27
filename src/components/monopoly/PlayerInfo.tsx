@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Player, GamePhase } from '../../type';
+import { Player, GamePhase } from '../../types/type';
 import PawnIcon from './PawnIcon';
 
 function usePrevious<T>(value: T): T | undefined {

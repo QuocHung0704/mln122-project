@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Player, GamePhase } from '../../type';
+import { Player, GamePhase } from '../../types/type';
 import CrisisBar from './CrisisBar';
 import GameLog from './GameLog';
 

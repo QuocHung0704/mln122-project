@@ -1,6 +1,6 @@
 import React from 'react';
-import { Player } from '../../type';
-import PawnIcon from '../Section2/PawnIcon';
+import { Player } from '../../types/type';
+import PawnIcon from '../monopoly/PawnIcon';
 
 interface GameOverModalProps {
     players: Player[];

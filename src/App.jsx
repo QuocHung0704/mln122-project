@@ -1,38 +1,58 @@
+// src/App.jsx
 import { useState } from "react";
 import "./App.css";
 import MultipleChoice from "./page/MultipleChoice";
-import QuizGame from "./components/Footer";
-import PlaceholderSection from "./components/PlaceholderSection";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
+import PlaceholderSection from "./components/common/PlaceholderSection";
+import Header from "./components/common/Header";
+import Footer from "./components/common/Footer";
 import Monopoly from "./page/Monopoly";
 
 function App() {
-  const [activeSection, setActiveSection] = useState("quiz"); 
+  const [activeSection, setActiveSection] = useState("quiz");
 
   const renderMainContent = () => {
     switch (activeSection) {
       case "quiz":
         return <MultipleChoice />;
       case "section2":
-        return <Monopoly title="Mục 2" />;
+        return <Monopoly />;
       case "section3":
         return <PlaceholderSection title="Mục 3" />;
       default:
-        return <QuizGame />;
+        return <MultipleChoice />;
     }
   };
-  return (
-    <div className="flex flex-col min-h-screen bg-stone-100 text-stone-900 font-sans">
-      <Header
-        activeSection={activeSection}
-        setActiveSection={setActiveSection}
-      />
 
-      <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+  const isPixelGame = activeSection === "section2";
+
+  return (
+    <div
+      className={
+        isPixelGame
+
+          ? "w-screen h-screen bg-[#FBF8E8] overflow-hidden"
+
+          : "flex flex-col min-h-screen bg-stone-100 text-stone-900 font-sans"
+      }
+    >
+      {!isPixelGame && (
+        <Header
+          activeSection={activeSection}
+          setActiveSection={setActiveSection}
+        />
+      )}
+
+      <main
+        className={
+          isPixelGame
+            ? "w-full h-full" 
+            : "flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12" // Layout web
+        }
+      >
         {renderMainContent()}
       </main>
-      <Footer />
+
+      {!isPixelGame && <Footer />}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 
-import { Square, SquareType } from '../type';
+import { Square, SquareType } from '../types/type';
 
 export const PLAYER_COLORS = ['#ef4444', '#3b82f6', '#22c55e', '#eab308'];
 
