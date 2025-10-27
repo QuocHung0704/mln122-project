@@ -1,5 +1,5 @@
 import React from 'react';
-import { EventCard } from '../../type';
+import { EventCard } from '../../types/type';
 
 interface EventCardModalProps {
     event: EventCard;

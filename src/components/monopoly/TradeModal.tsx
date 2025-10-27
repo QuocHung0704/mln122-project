@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Player, TradeOffer } from '../../type';
+import { Player, TradeOffer } from '../../types/type';
 import PawnIcon from './PawnIcon';
 
 interface TradeModalProps {

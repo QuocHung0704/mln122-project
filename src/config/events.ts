@@ -1,4 +1,4 @@
-import { EventCard, EffectType } from './type';
+import { EventCard, EffectType } from '../types/type';
 
 export const EVENT_CARDS: EventCard[] = [
   {

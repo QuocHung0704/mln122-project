@@ -1,5 +1,5 @@
 import React from 'react';
-import { Square, SquareType } from '../../type';
+import { Square, SquareType } from '../../types/type';
 
 const SquareIcon: React.FC<{ square: Square }> = ({ square }) => {
     const iconClass = "text-2xl leading-none";

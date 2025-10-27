@@ -1,19 +1,19 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Player, GamePhase, Square, SquareType, EventCard, EffectType, TradeOffer } from '../type';
-import { BOARD_SQUARES, PLAYER_COLORS } from '../utils/constant';
-import { EVENT_CARDS } from '../events';
-import GameBoard from '../components/Section2/GameBoard';
-import PlayerInfo from '../components/Section2/PlayerInfo';
-import GameOverModal from '../components/Section2/GameOverModal';
-import RulesModal from '../components/Section2/RuleModal';
-import GameSetup from '../components/Section2/GameSetup';
-import TradeModal from '../components/Section2/TradeModal';
-import RightPanel from '../components/Section2/RightPanel';
-import CasinoModal from '../components/Section2/CasinoModal';
-import EventCardModal from '../components/Section2/EventCardModal';
-import PlayerStatusView from '../components/Section2/PlayerStatusView';
-import TutorialGuide from '../components/Section2/TutorialGuide';
-import { TUTORIAL_STEPS } from '../TutorialStep';
+import { Player, GamePhase, Square, SquareType, EventCard, EffectType, TradeOffer } from '../types/type';
+import { BOARD_SQUARES, PLAYER_COLORS } from '../config/constant';
+import { EVENT_CARDS } from '../config/events';
+import GameBoard from '../components/monopoly/GameBoard';
+import PlayerInfo from '../components/monopoly/PlayerInfo';
+import GameOverModal from '../components/monopoly/GameOverModal';
+import RulesModal from '../components/monopoly/RuleModal';
+import GameSetup from '../components/monopoly/GameSetup';
+import TradeModal from '../components/monopoly/TradeModal';
+import RightPanel from '../components/monopoly/RightPanel';
+import CasinoModal from '../components/monopoly/CasinoModal';
+import EventCardModal from '../components/monopoly/EventCardModal';
+import PlayerStatusView from '../components/monopoly/PlayerStatusView';
+import TutorialGuide from '../components/monopoly/TutorialGuide';
+import { TUTORIAL_STEPS } from '../config/TutorialStep';
 
 interface CasinoBetResult {
     betCost: number;

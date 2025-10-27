@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { PLAYER_COLORS } from '../../utils/constant';
+import { PLAYER_COLORS } from '../../config/constant';
 
 interface GameSetupProps {
     onStartGame: (numPlayers: number, playerNames: string[], startWithTutorial: boolean) => void;
