@@ -55,21 +55,6 @@ const QuizGame = () => {
             <p className="text-stone-700 mt-4 text-base leading-relaxed">{result.description}</p>
           </div>
         </div>
-
-        <div className="mt-8 pt-6 border-t border-stone-200">
-          <h4 className="text-xl font-semibold text-stone-800 mb-4 flex items-center">
-            <BarChart2 className="mr-2 h-5 w-5 text-amber-800" />
-            Phân tích điểm số:
-          </h4>
-          <ul className="space-y-2">
-            {sortedScores.map(([key, score]) => (
-              <li key={key} className="flex justify-between items-center p-3 bg-stone-50 rounded-md">
-                <span className="font-medium text-stone-700">{resultsData[key].name}:</span>
-                <span className="font-bold text-lg text-amber-900">{score} điểm</span>
-              </li>
-            ))}
-          </ul>
-        </div>
         
         {/* Nút chơi lại */}
         <button
