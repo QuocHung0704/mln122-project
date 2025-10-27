@@ -5,6 +5,7 @@ import QuizGame from "./components/Footer";
 import PlaceholderSection from "./components/PlaceholderSection";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import Monopoly from "./page/Monopoly";
 
 function App() {
   const [activeSection, setActiveSection] = useState("quiz"); 
@@ -14,7 +15,7 @@ function App() {
       case "quiz":
         return <MultipleChoice />;
       case "section2":
-        return <PlaceholderSection title="Mục 2" />;
+        return <Monopoly title="Mục 2" />;
       case "section3":
         return <PlaceholderSection title="Mục 3" />;
       default:
