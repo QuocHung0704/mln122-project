@@ -606,7 +606,7 @@ const Monopoly: React.FC = () => {
     }
 
     return (
-        <div className="w-screen h-screen p-4 grid grid-cols-[350px_1fr_350px] gap-4 items-start">
+        <div className="w-full h-full p-4 grid grid-cols-[350px_1fr_350px] gap-4 items-start">
             <PlayerInfo 
                 players={players} 
                 currentPlayerIndex={currentPlayerIndex} 
