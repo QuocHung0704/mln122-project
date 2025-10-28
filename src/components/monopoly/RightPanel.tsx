@@ -32,14 +32,14 @@ const Dice: React.FC<{ value: number; isRolling: boolean }> = ({ value, isRollin
         <div className="w-12 h-12 bg-white border-2 border-black p-1 relative">
             {pipPositions.map(pos => {
                 let posClass = '';
-                if(pos === 'center') posClass = 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2';
-                if(pos === 'top-left') posClass = 'top-1 left-1';
-                if(pos === 'top-right') posClass = 'top-1 right-1';
-                if(pos === 'bottom-left') posClass = 'bottom-1 left-1';
-                if(pos === 'bottom-right') posClass = 'bottom-1 right-1';
-                if(pos === 'middle-left') posClass = 'top-1/2 left-1 -translate-y-1/2';
-                if(pos === 'middle-right') posClass = 'top-1/2 right-1 -translate-y-1/2';
-                
+                if (pos === 'center') posClass = 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2';
+                if (pos === 'top-left') posClass = 'top-1 left-1';
+                if (pos === 'top-right') posClass = 'top-1 right-1';
+                if (pos === 'bottom-left') posClass = 'bottom-1 left-1';
+                if (pos === 'bottom-right') posClass = 'bottom-1 right-1';
+                if (pos === 'middle-left') posClass = 'top-1/2 left-1 -translate-y-1/2';
+                if (pos === 'middle-right') posClass = 'top-1/2 right-1 -translate-y-1/2';
+
                 return <div key={pos} className={`absolute w-2 h-2 bg-black rounded-full ${posClass}`}></div>
             })}
         </div>
@@ -72,10 +72,10 @@ const Controls: React.FC<{
 
     return (
         <div className="pixel-panel p-3 text-center">
-            <h3 className="font-pixel text-sm mb-2">Lượt của: <span style={{color: currentPlayer.color}}>{currentPlayer.name}</span></h3>
+            <h3 className="font-pixel text-sm mb-2">Lượt của: <span style={{ color: currentPlayer.color }}>{currentPlayer.name}</span></h3>
             <div className="flex justify-center gap-4 my-3">
-                 <Dice value={dice[0]} isRolling={isDiceRolling} />
-                 <Dice value={dice[1]} isRolling={isDiceRolling} />
+                <Dice value={dice[0]} isRolling={isDiceRolling} />
+                <Dice value={dice[1]} isRolling={isDiceRolling} />
             </div>
             <button
                 id={buttonId}
@@ -120,7 +120,7 @@ interface RightPanelProps {
 
 const RightPanel: React.FC<RightPanelProps> = (props) => {
     return (
-         <aside className="h-full pixel-panel p-4 flex flex-col gap-4">
+        <aside className="h-full pixel-panel p-4 flex flex-col gap-4">
             <div className="flex items-center justify-between">
                 <h2 className="font-pixel text-xl text-center">
                     Vòng {props.round}/10
@@ -132,8 +132,8 @@ const RightPanel: React.FC<RightPanelProps> = (props) => {
                     <button onClick={props.onShowRules} className="w-10 h-10 pixel-button-color bg-yellow-400 flex items-center justify-center font-pixel text-xl text-black">?</button>
                 </div>
             </div>
-            
-            <Controls 
+
+            <Controls
                 onRollDice={props.onRollDice}
                 onEndTurn={props.onEndTurn}
                 gamePhase={props.gamePhase}
@@ -145,9 +145,11 @@ const RightPanel: React.FC<RightPanelProps> = (props) => {
                 <JackpotDisplay amount={props.jackpot} />
                 <CrisisBar crisisLevel={props.crisisLevel} maxLevel={10} />
             </div>
-            
-            <div id="game-log-panel" className="flex-grow flex flex-col min-h-0">
-                 <GameLog log={props.log} tradeLog={props.tradeLog} />
+
+            <div className="flex-grow flex flex-col min-h-0 relative"> {/* Thêm relative */}
+                <div className="absolute inset-0 overflow-hidden"> {/* Thêm absolute container */}
+                    <GameLog log={props.log} tradeLog={props.tradeLog} />
+                </div>
             </div>
 
         </aside>

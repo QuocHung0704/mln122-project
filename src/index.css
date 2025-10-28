@@ -2,10 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+/* THÊM VÀO: Đảm bảo layout gốc luôn đầy màn hình */
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 body {
   font-family: 'Inter', sans-serif;
   background: #FBF8E8;
   color: #1f2937;
+  /* Đã xóa overflow: hidden ở đây để Quiz cuộn được */
 }
 .font-pixel {
   font-family: 'VT323', monospace;
