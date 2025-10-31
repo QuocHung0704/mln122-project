@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CHARACTERS, PLAYER_COLORS } from '../../config/constant';
+import { CHARACTERS, PLAYER_COLORS } from '../../../public/constant';
 
 interface GameSetupProps {
     onStartGame: (

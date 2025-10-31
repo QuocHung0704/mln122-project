@@ -1,5 +1,6 @@
 
-import { Character, Square, SquareType } from '../types/type';
+import { Character, Square, SquareType } from '../src/types/type';
+
 
 export const PLAYER_COLORS = ['#ef4444', '#3b82f6', '#22c55e', '#eab308'];
 
@@ -8,7 +9,7 @@ export const CHARACTERS: Character[] = [
     id: 'smith',
     name: 'Adam Smith',
     img: 'https://tse4.mm.bing.net/th/id/OIP.zdpVzbhGU1lkZA3TD8mzMgHaHa?pid=Api&P=0&h=180',
-    cardImg: '../assets/yellow card.png',
+    cardImg: './assets/yellow card.png',
   },
   {
     id: 'engels',
@@ -17,7 +18,7 @@ export const CHARACTERS: Character[] = [
     cardImg: '../assets/green card.png',
   },
   {
-    id: 'marx',
+    id: 'marx', 
     name: 'Karl Marx',
     img: 'https://tse2.mm.bing.net/th/id/OIP.EdQ2y8gyLuSugbb5tUOprwHaJY?pid=Api&P=0&h=180',
     cardImg: '../assets/red card.png',
@@ -25,7 +26,7 @@ export const CHARACTERS: Character[] = [
   {
     id: 'montchrestien',
     name: 'Antoine de Montchrestien',
-    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Antoine_de_Montchrestien.jpg/440px-Antoine_de_Montchrestien.jpg',
+    img: 'https://cdn.britannica.com/75/151775-050-BD03DDB7/portrait-prelate-French-Cardinal-Richelieu-statesman.jpg?w=300',
     cardImg: '../assets/blue card.png',
   },
 ];
