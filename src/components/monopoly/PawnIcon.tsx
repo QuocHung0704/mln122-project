@@ -1,5 +1,5 @@
 import React from 'react';
-import { CHARACTER_MAP } from '../../config/constant';
+import { CHARACTER_MAP } from '../../../public/constant';
 
 interface PawnIconProps {
   color: string;

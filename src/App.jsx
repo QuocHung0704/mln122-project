@@ -30,7 +30,7 @@ function App() {
       className={
         isPixelGame
 
-          ? "w-screen h-screen bg-[#FBF8E8] overflow-hidden"
+          ? "w-screen h-screen bg-[#FBF8E8]"
 
           : "flex flex-col min-h-screen bg-stone-100 text-stone-900 font-sans"
       }

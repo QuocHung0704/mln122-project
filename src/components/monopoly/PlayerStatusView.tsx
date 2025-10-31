@@ -1,6 +1,6 @@
 import React from 'react';
 import { Player } from '../../types/type';
-import { BOARD_SQUARES } from '../../config/constant';
+import { BOARD_SQUARES } from '../../../public/constant';
 
 const StatusItem: React.FC<{ icon: string; label: string; value: string | number; color?: string }> = ({ icon, label, value, color }) => (
     <div className="flex items-center gap-3 text-sm">

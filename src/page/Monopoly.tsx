@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Player, GamePhase, Square, SquareType, EventCard, EffectType, TradeOffer } from '../types/type';
-import { BOARD_SQUARES, PLAYER_COLORS } from '../config/constant';
+import { BOARD_SQUARES, PLAYER_COLORS } from '../../public/constant';
 import { EVENT_CARDS } from '../config/events';
 import GameBoard from '../components/monopoly/GameBoard';
 import PlayerInfo from '../components/monopoly/PlayerInfo';
