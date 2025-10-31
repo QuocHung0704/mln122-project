@@ -66,45 +66,52 @@ const Monopoly: React.FC = () => {
         );
     }, []);
 
-    const handleStartGame = useCallback((numPlayers: number, playerNames: string[], startWithTutorial: boolean) => {
-        const ICONS = ['🐵', '🦁', '🦊', '🐷'];
-        const initialPlayers: Player[] = [];
-        for (let i = 0; i < numPlayers; i++) {
+    const handleStartGame = useCallback(
+        (
+          numPlayers: number,
+          playerNames: string[],
+          playerCharacters: string[], 
+          startWithTutorial: boolean,
+        ) => {
+          const initialPlayers: Player[] = [];
+          for (let i = 0; i < numPlayers; i++) {
             initialPlayers.push({
-                id: i + 1,
-                name: playerNames[i] || `Tư Bản ${i + 1}`,
-                chips: 50,
-                position: 0,
-                color: PLAYER_COLORS[i],
-                icon: ICONS[i],
-                hasRawMaterials: false,
-                hasLabor: false,
-                goodsCount: 0,
-                missNextTurn: false,
-                combo: { type: 'none', count: 0 },
-                stats: {
-                    goodsProduced: 0,
-                    goodsSold: 0,
-                    combosHit: 0,
-                    casinoNet: 0,
-                    jackpotsWon: 0,
-                },
+              id: i + 1,
+              name: playerNames[i] || `Tư Bản ${i + 1}`,
+              chips: 50,
+              position: 0,
+              color: PLAYER_COLORS[i],
+              icon: playerCharacters[i], 
+              hasRawMaterials: false,
+              hasLabor: false,
+              goodsCount: 0,
+              missNextTurn: false,
+              combo: { type: 'none', count: 0 },
+              stats: {
+                goodsProduced: 0,
+                goodsSold: 0,
+                combosHit: 0,
+                casinoNet: 0,
+                jackpotsWon: 0,
+              },
             });
-        }
-        
-        setPlayers(initialPlayers);
-        setCurrentPlayerIndex(0);
-        setGamePhase(GamePhase.ROLLING);
-        setRound(1);
-        setCrisisLevel(0);
-        setJackpot(20);
-        setLog(['Trò chơi bắt đầu!']);
-        setTradeLog([]);
-        setShowRulesModal(false);
-        if (startWithTutorial) {
+          }
+    
+          setPlayers(initialPlayers);
+          setCurrentPlayerIndex(0);
+          setGamePhase(GamePhase.ROLLING);
+          setRound(1);
+          setCrisisLevel(0);
+          setJackpot(20);
+          setLog(['Trò chơi bắt đầu!']);
+          setTradeLog([]);
+          setShowRulesModal(false);
+          if (startWithTutorial) {
             setTutorialStep(0);
-        }
-    }, []);
+          }
+        },
+        [],
+      );
 
     const handleResetToSetup = () => {
         setPlayers([]);

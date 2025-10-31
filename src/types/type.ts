@@ -13,6 +13,13 @@ export enum SquareType {
     color: string;
     description: string;
   }
+
+  export interface Character {
+    id: string;
+    name: string;
+    img: string;
+    cardImg: string;
+  }
   
   export interface PlayerStats {
     goodsProduced: number;
