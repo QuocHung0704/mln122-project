@@ -1,7 +1,42 @@
 
-import { Square, SquareType } from '../types/type';
+import { Character, Square, SquareType } from '../types/type';
 
 export const PLAYER_COLORS = ['#ef4444', '#3b82f6', '#22c55e', '#eab308'];
+
+export const CHARACTERS: Character[] = [
+  {
+    id: 'smith',
+    name: 'Adam Smith',
+    img: 'https://tse4.mm.bing.net/th/id/OIP.zdpVzbhGU1lkZA3TD8mzMgHaHa?pid=Api&P=0&h=180',
+    cardImg: '../assets/yellow card.png',
+  },
+  {
+    id: 'engels',
+    name: 'Friedrich Engels',
+    img: 'https://tse3.mm.bing.net/th/id/OIP.vPp7yBzLDBwfR9IgjjTZxgHaJ4?pid=Api&P=0&h=180',
+    cardImg: '../assets/green card.png',
+  },
+  {
+    id: 'marx',
+    name: 'Karl Marx',
+    img: 'https://tse2.mm.bing.net/th/id/OIP.EdQ2y8gyLuSugbb5tUOprwHaJY?pid=Api&P=0&h=180',
+    cardImg: '../assets/red card.png',
+  },
+  {
+    id: 'montchrestien',
+    name: 'Antoine de Montchrestien',
+    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Antoine_de_Montchrestien.jpg/440px-Antoine_de_Montchrestien.jpg',
+    cardImg: '../assets/blue card.png',
+  },
+];
+
+export const CHARACTER_MAP: Record<string, Character> = CHARACTERS.reduce(
+  (acc, char) => {
+    acc[char.id] = char;
+    return acc;
+  },
+  {} as Record<string, Character>,
+);
 
 // New color palette inspired by the reference image
 const PALETTE = {
