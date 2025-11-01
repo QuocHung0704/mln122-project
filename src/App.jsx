@@ -2,10 +2,10 @@
 import { useState } from "react";
 import "./App.css";
 import MultipleChoice from "./page/MultipleChoice";
-import PlaceholderSection from "./components/common/PlaceholderSection";
 import Header from "./components/common/Header";
 import Footer from "./components/common/Footer";
 import Monopoly from "./page/Monopoly";
+import FlashcardQuiz from "./components/flashcard/FlashCardQuiz"; // IMPORT MỤC MỚI
 
 function App() {
   const [activeSection, setActiveSection] = useState("quiz");
@@ -17,7 +17,7 @@ function App() {
       case "section2":
         return <Monopoly />;
       case "section3":
-        return <PlaceholderSection title="Mục 3" />;
+        return <FlashcardQuiz />; // SỬ DỤNG COMPONENT MỚI CHO MỤC 3
       default:
         return <MultipleChoice />;
     }
@@ -29,9 +29,7 @@ function App() {
     <div
       className={
         isPixelGame
-
           ? "w-screen h-screen bg-[#FBF8E8]"
-
           : "flex flex-col min-h-screen bg-stone-100 text-stone-900 font-sans"
       }
     >
@@ -45,7 +43,7 @@ function App() {
       <main
         className={
           isPixelGame
-            ? "w-full h-full" 
+            ? "w-full h-full"
             : "flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12" // Layout web
         }
       >
