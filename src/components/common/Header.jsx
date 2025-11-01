@@ -1,11 +1,10 @@
-
-import { Library, ClipboardList, Package, Link } from 'lucide-react';
+import { Library, ClipboardList, Package, Brain } from 'lucide-react'; // Thêm icon Brain
 
 const Header = ({ activeSection, setActiveSection }) => {
   const navItems = [
     { id: 'quiz', label: 'Trắc Nghiệm Tư Tưởng', icon: ClipboardList },
-    { id: 'section2', label: 'Mục 2', icon: Package },
-    { id: 'section3', label: 'Mục 3', icon: Package },
+    { id: 'section2', label: 'Vòng Xoáy Tư Bản', icon: Package }, // Đổi tên Mục 2
+    { id: 'section3', label: 'Quiz Luyện Tập', icon: Brain }, // ĐỔI TÊN VÀ ICON MỤC 3
   ];
 
   return (
@@ -58,4 +57,4 @@ const Header = ({ activeSection, setActiveSection }) => {
   );
 };
 
-export default Header;
+export default Header;  
