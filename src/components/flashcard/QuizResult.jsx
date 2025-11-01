@@ -1,7 +1,9 @@
-import React from 'react';
-import { BarChart2, RotateCcw, Settings } from 'lucide-react'; // Thay FilePlus bằng Settings
+import React, { useState } from 'react'; // Import useState
+import { BarChart2, RotateCcw, Settings, List, ChevronDown, ChevronUp } from 'lucide-react'; // Import icons
 
-const QuizResults = ({ score, total, onRestart, onNewSet }) => {
+const QuizResults = ({ score, total, onRestart, onNewSet, questions }) => { // Thêm 'questions' prop
+  const [showAnswers, setShowAnswers] = useState(false); // Thêm state để bật/tắt đáp án
+
   const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
   let feedback = "Hãy cố gắng hơn nhé!";
   if (percentage >= 90) {
@@ -27,16 +29,47 @@ const QuizResults = ({ score, total, onRestart, onNewSet }) => {
           className="w-full flex-1 flex items-center justify-center px-6 py-3 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 transition-all duration-300"
         >
           <Settings className="mr-2 h-5 w-5" />
-          Cài đặt mới
+          Tùy chỉnh quiz
         </button>
         <button
           onClick={onRestart} // Nút này làm lại BỘ CÂU HỎI HIỆN TẠI
           className="w-full flex-1 flex items-center justify-center px-6 py-3 bg-amber-800 text-white font-bold rounded-lg shadow-md hover:bg-amber-900 transition-all duration-300"
         >
           <RotateCcw className="mr-2 h-5 w-5" />
-          Làm lại bộ này
+          Làm lại đề này
         </button>
       </div>
+
+      {/* *** KHU VỰC MỚI: HIỂN THỊ ĐÁP ÁN *** */}
+      <div className="w-full mt-6 border-t border-stone-200 pt-6">
+        <button
+          onClick={() => setShowAnswers(!showAnswers)}
+          className="w-full flex items-center justify-center px-4 py-2 bg-stone-100 text-stone-700 font-semibold rounded-lg hover:bg-stone-200 transition-colors"
+        >
+          <List className="mr-2 h-5 w-5" />
+          {showAnswers ? 'Ẩn đáp án' : 'Xem đáp án bộ câu hỏi này'}
+          {showAnswers ? <ChevronUp className="ml-2 h-5 w-5" /> : <ChevronDown className="ml-2 h-5 w-5" />}
+        </button>
+
+        {showAnswers && (
+          <div className="mt-4 text-left space-y-4 max-h-60 overflow-y-auto pr-2">
+            {questions
+                .sort((a, b) => a.questionNumber - b.questionNumber) // Sắp xếp lại theo thứ tự 1, 2, 3...
+                .map((q) => (
+              <div key={q.questionNumber} className="p-3 bg-stone-50 rounded-lg border border-stone-200">
+                <p className="text-sm font-semibold text-stone-800">
+                  {q.questionNumber}. {q.question}
+                </p>
+                <p className="text-sm text-green-700 font-bold mt-1">
+                  Đáp án: {q.correctAnswer}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      {/* *** KẾT THÚC KHU VỰC MỚI *** */}
+
     </div>
   );
 };

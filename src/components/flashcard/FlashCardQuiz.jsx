@@ -3,7 +3,7 @@ import QuizSetup from '../flashcard/QuizSetup';
 import QuizActive from '../flashcard/QuizActive';
 import QuizResults from '../flashcard/QuizResult';
 import { Package } from 'lucide-react';
-import { FLASHCARD_DATA } from '../../data'; 
+import { FLASHCARD_DATA } from '../../data'; // IMPORT DỮ LIỆU
 
 // Helper function to shuffle an array
 const shuffleArray = (array) => {
@@ -30,9 +30,12 @@ const generateQuizSet = (fullData, numQuestions) => {
     // Shuffle the options (A, B, C, D) for each question
     const shuffledOptions = shuffleArray([...item.options]);
     
+    // *** THAY ĐỔI MỚI: Loại bỏ tiền tố "Câu X." ***
+    const cleanedQuestion = item.question.replace(/^Câu \d+\. /, '');
+
     return {
       questionNumber: index + 1,
-      question: item.question,
+      question: cleanedQuestion, // Sử dụng câu hỏi đã được làm sạch
       answerOptions: shuffledOptions, // Dùng các lựa chọn đã được xáo trộn
       correctAnswer: item.correctAnswer, // Đáp án đúng vẫn được giữ nguyên
     };
@@ -104,6 +107,7 @@ const FlashcardQuiz = () => {
             total={quizQuestions.length}
             onRestart={handleRedoQuiz} // "Làm lại bộ này"
             onNewSet={handleRestart} // "Cài đặt mới"
+            questions={quizQuestions} // *** THAY ĐỔI MỚI: Truyền câu hỏi vào kết quả ***
           />
         );
       case 'setup':

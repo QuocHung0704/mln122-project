@@ -36,7 +36,6 @@ const QuizSetup = ({ onStartQuiz, maxQuestions }) => {
           className="w-full p-2 border border-stone-300 rounded-md"
           disabled={maxQuestions === 0}
         />
-        <p className="text-xs text-stone-500 mt-1">Tổng số câu hỏi có sẵn: {maxQuestions}</p>
       </div>
 
       {/* Tùy chỉnh thời gian */}
