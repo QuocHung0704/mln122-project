@@ -1,46 +1,51 @@
-import React, { useState } from 'react'; // Import useState
-import { BarChart2, RotateCcw, Settings, List, ChevronDown, ChevronUp } from 'lucide-react'; // Import icons
+import React, { useState } from 'react';
+import { Award, Settings, List, ChevronDown, ChevronUp } from 'lucide-react';
 
-const QuizResults = ({ score, total, onRestart, onNewSet, questions }) => { // Thêm 'questions' prop
-  const [showAnswers, setShowAnswers] = useState(false); // Thêm state để bật/tắt đáp án
-
-  const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
-  let feedback = "Hãy cố gắng hơn nhé!";
-  if (percentage >= 90) {
-      feedback = "Tuyệt vời! Bạn thật xuất sắc!";
-  } else if (percentage >= 70) {
-      feedback = "Làm tốt lắm! Bạn đã nắm vững kiến thức.";
-  } else if (percentage >= 50) {
-      feedback = "Khá tốt! Cố gắng thêm chút nữa nhé.";
-  }
+const QuizResults = ({ players, questions, onNewSet }) => {
+  const [showAnswers, setShowAnswers] = useState(false); // Thêm state
+  const sortedPlayers = [...players].sort((a, b) => b.chips - a.chips);
+  const winner = sortedPlayers[0];
 
   return (
     <div className="flex flex-col items-center text-center animate-fadeIn">
-      <BarChart2 className="h-16 w-16 text-amber-800 mb-4" />
-      <h3 className="text-3xl font-bold font-serif text-amber-900 mb-2">Hoàn thành!</h3>
-      <p className="text-xl text-stone-800 font-semibold">
-        Kết quả của bạn: {score} / {total} ({percentage}%)
-      </p>
-      <p className="text-lg text-stone-600 mt-2 italic">{feedback}</p>
+      <Award className="h-16 w-16 text-amber-800 mb-4" />
+      <h3 className="text-3xl font-bold font-serif text-amber-900 mb-2">Kết Thúc!</h3>
+      
+      {/* Người thắng cuộc */}
+      <div className="w-full bg-amber-100 border-2 border-amber-400 p-4 rounded-lg my-4">
+        <p className="text-sm font-semibold text-amber-800">NGƯỜI CHIẾN THẮNG</p>
+        <h4 className="text-2xl font-bold text-amber-900">{winner.name}</h4>
+        <p className="text-xl font-semibold text-green-700">${winner.chips}</p>
+      </div>
 
-      <div className="flex flex-col sm:flex-row gap-4 mt-8 w-full">
+      {/* Bảng xếp hạng */}
+      <div className="w-full max-w-md space-y-3 mt-4">
+        {sortedPlayers.map((player, index) => (
+          <div
+            key={player.id}
+            className="flex justify-between items-center p-3 bg-stone-50 rounded-lg border border-stone-200"
+          >
+            <span className="text-lg font-bold text-stone-800">
+              #{index + 1} {player.name}
+            </span>
+            <span className="text-lg font-semibold text-stone-700">
+              ${player.chips}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <div className="w-full flex flex-col sm:flex-row gap-4 mt-8">
         <button
           onClick={onNewSet} // Nút này quay về màn hình setup
           className="w-full flex-1 flex items-center justify-center px-6 py-3 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 transition-all duration-300"
         >
           <Settings className="mr-2 h-5 w-5" />
-          Tùy chỉnh quiz
-        </button>
-        <button
-          onClick={onRestart} // Nút này làm lại BỘ CÂU HỎI HIỆN TẠI
-          className="w-full flex-1 flex items-center justify-center px-6 py-3 bg-amber-800 text-white font-bold rounded-lg shadow-md hover:bg-amber-900 transition-all duration-300"
-        >
-          <RotateCcw className="mr-2 h-5 w-5" />
-          Làm lại đề này
+          Tạo Game Mới
         </button>
       </div>
 
-      {/* *** KHU VỰC MỚI: HIỂN THỊ ĐÁP ÁN *** */}
+      {/* *** KHU VỰC: HIỂN THỊ ĐÁP ÁN *** */}
       <div className="w-full mt-6 border-t border-stone-200 pt-6">
         <button
           onClick={() => setShowAnswers(!showAnswers)}

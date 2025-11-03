@@ -17,27 +17,22 @@ const shuffleArray = (array) => {
   return array;
 };
 
+// *** HÀM ĐÃ ĐƯỢC CẬP NHẬT ***
 // Helper function to generate quiz questions from the imported data
-const generateQuizSet = (fullData, numQuestions) => {
-  // 1. Shuffle the entire question bank
+const generateQuizSet = (fullData, numQuestions) => { // Chấp nhận numQuestions
   const shuffledData = shuffleArray([...fullData]);
-  
-  // 2. Select the number of questions the user wants
-  const selectedQuestions = shuffledData.slice(0, Math.min(numQuestions, shuffledData.length));
+  // Sử dụng numQuestions thay vì hardcode
+  const selectedQuestions = shuffledData.slice(0, Math.min(numQuestions, shuffledData.length)); 
 
-  // 3. Format them for the quiz
   return selectedQuestions.map((item, index) => {
-    // Shuffle the options (A, B, C, D) for each question
     const shuffledOptions = shuffleArray([...item.options]);
-    
-    // *** THAY ĐỔI MỚI: Loại bỏ tiền tố "Câu X." ***
     const cleanedQuestion = item.question.replace(/^Câu \d+\. /, '');
 
     return {
       questionNumber: index + 1,
-      question: cleanedQuestion, // Sử dụng câu hỏi đã được làm sạch
-      answerOptions: shuffledOptions, // Dùng các lựa chọn đã được xáo trộn
-      correctAnswer: item.correctAnswer, // Đáp án đúng vẫn được giữ nguyên
+      question: cleanedQuestion,
+      answerOptions: shuffledOptions,
+      correctAnswer: item.correctAnswer,
     };
   });
 };
@@ -46,12 +41,12 @@ const generateQuizSet = (fullData, numQuestions) => {
 const FlashcardQuiz = () => {
   const [quizQuestions, setQuizQuestions] = useState([]);
   const [quizState, setQuizState] = useState('setup'); // 'setup', 'active', 'results'
-  const [userAnswers, setUserAnswers] = useState({});
-  const [timeLimit, setTimeLimit] = useState(5); // 0 for unlimited, default 5 mins
+  const [players, setPlayers] = useState([]); // State mới: [ { id, name, chips }, ... ]
 
-  const handleStartQuiz = (numQuestions, selectedTimeLimit) => {
-    // Generate a new set of questions from the main data file
-    const newQuizSet = generateQuizSet(FLASHCARD_DATA, numQuestions);
+  // *** HÀM ĐÃ ĐƯỢC CẬP NHẬT ***
+  const handleStartQuiz = (initialPlayers, numQuestions) => { // Chấp nhận numQuestions
+    // Truyền numQuestions vào hàm generator
+    const newQuizSet = generateQuizSet(FLASHCARD_DATA, numQuestions); 
     
     if (newQuizSet.length === 0) {
         alert("Không thể tạo quiz. File data không có đủ câu hỏi.");
@@ -59,36 +54,19 @@ const FlashcardQuiz = () => {
     }
 
     setQuizQuestions(newQuizSet);
-    setTimeLimit(selectedTimeLimit); // Set the time limit
-    setUserAnswers({});
+    setPlayers(initialPlayers);
     setQuizState('active');
   };
 
-  const handleSubmitQuiz = (answers) => {
-    setUserAnswers(answers);
+  const handleEndQuiz = () => {
     setQuizState('results');
   };
 
-  const handleRestart = () => { // Goes back to setup
+  const handleNewGame = () => { // Quay về setup
     setQuizQuestions([]);
-    setUserAnswers({});
+    setPlayers([]);
     setQuizState('setup');
   };
-  
-  const handleRedoQuiz = () => { // Restarts the same quiz
-     setUserAnswers({});
-     setQuizState('active'); // Re-use the current quizQuestions and timeLimit
-  }
-
-  const score = useMemo(() => {
-    return quizQuestions.reduce((correctCount, q) => {
-      const userAnswer = userAnswers[q.questionNumber];
-      if (userAnswer === q.correctAnswer) {
-        return correctCount + 1;
-      }
-      return correctCount;
-    }, 0);
-  }, [quizQuestions, userAnswers, quizState]);
 
   const renderContent = () => {
     switch (quizState) {
@@ -96,26 +74,26 @@ const FlashcardQuiz = () => {
         return (
           <QuizActive 
             questions={quizQuestions} 
-            onSubmit={handleSubmitQuiz} 
-            timeLimit={timeLimit} // Pass timeLimit
+            players={players}
+            setPlayers={setPlayers} // Truyền hàm setPlayers
+            onEndQuiz={handleEndQuiz} 
           />
         );
       case 'results':
         return (
           <QuizResults 
-            score={score} 
-            total={quizQuestions.length}
-            onRestart={handleRedoQuiz} // "Làm lại bộ này"
-            onNewSet={handleRestart} // "Cài đặt mới"
-            questions={quizQuestions} // *** THAY ĐỔI MỚI: Truyền câu hỏi vào kết quả ***
+            players={players}
+            questions={quizQuestions} // Truyền câu hỏi để xem đáp án
+            onNewSet={handleNewGame} // "Cài đặt mới"
           />
         );
       case 'setup':
       default:
         return (
+          // *** PROP ĐÃ ĐƯỢC CẬP NHẬT ***
           <QuizSetup 
             onStartQuiz={handleStartQuiz} 
-            maxQuestions={FLASHCARD_DATA.length} // Pass max questions
+            maxQuestions={FLASHCARD_DATA.length} // Truyền số câu hỏi tối đa
           />
         );
     }
@@ -125,7 +103,7 @@ const FlashcardQuiz = () => {
     <div className="w-full max-w-3xl mx-auto bg-white p-6 sm:p-8 rounded-xl shadow-2xl animate-fadeIn">
       <div className="flex items-center justify-center text-center text-stone-600 mb-6">
         <Package className="h-10 w-10 text-amber-800" />
-        <h2 className="text-3xl font-bold font-serif text-amber-900 ml-3">Quiz Luyện Tập</h2>
+        <h2 className="text-3xl font-bold font-serif text-amber-900 ml-3">Quiz Đặt Cược</h2>
       </div>
       {renderContent()}
     </div>
