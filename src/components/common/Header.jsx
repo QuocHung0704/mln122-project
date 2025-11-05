@@ -10,14 +10,16 @@ const Header = ({ activeSection, setActiveSection }) => {
   return (
     <header className="bg-white shadow-md sticky top-0 z-10">
       <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-24">
           {/* Tiêu đề trang */}
           <a href="QuizGame">
           <div className="flex-shrink-0 flex items-center">           
-            <Library className="h-8 w-8 text-amber-900" />
-            <span className="ml-2 text-xl sm:text-2xl font-bold font-serif text-amber-900">
-              Triết Học Kinh Tế
-            </span>
+            {/* THAY ĐỔI Ở ĐÂY: Tăng kích cỡ logo lên h-20 w-20 */}
+            <img 
+              src="/public/assets/CCD-06.png" 
+              alt="Logo" 
+              className="h-20 w-21 object-contain" 
+            />
           </div>
           </a>
 
@@ -57,4 +59,4 @@ const Header = ({ activeSection, setActiveSection }) => {
   );
 };
 
-export default Header;  
+export default Header;

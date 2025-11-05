@@ -8,13 +8,20 @@ interface PawnIconProps {
 }
 
 const PawnIcon: React.FC<PawnIconProps> = ({ color, icon, className = '', style }) => {
-  // The parent container should control the font size for the emoji
+  // Kiểm tra xem icon có phải là URL/path (chứa / hoặc .) hay không
+  // Hoặc kiểm tra xem có phải là http
+  const isImage = icon.includes('http') || icon.includes('/') || icon.includes('.');
+
   return (
     <div
-      className={`w-full h-full rounded-full border-[3px] border-black flex items-center justify-center ${className}`}
+      className={`w-full h-full rounded-full border-[3px] border-black flex items-center justify-center overflow-hidden ${className}`}
       style={{ backgroundColor: color, ...style }}
     >
-      <span>{icon}</span>
+      {isImage ? (
+        <img src={icon} alt="pawn" className="w-full h-full object-cover" />
+      ) : (
+        <span className="text-lg">{icon}</span> // Thêm class để emoji to hơn một chút nếu cần
+      )}
     </div>
   );
 };

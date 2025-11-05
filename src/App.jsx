@@ -5,7 +5,7 @@ import MultipleChoice from "./page/MultipleChoice";
 import Header from "./components/common/Header";
 import Footer from "./components/common/Footer";
 import Monopoly from "./page/Monopoly";
-import FlashcardQuiz from "./components/flashcard/FlashCardQuiz"; // IMPORT MỤC MỚI
+import FlashcardQuiz from "./components/flashcard/FlashCardQuiz";
 
 function App() {
   const [activeSection, setActiveSection] = useState("quiz");
@@ -17,7 +17,7 @@ function App() {
       case "section2":
         return <Monopoly />;
       case "section3":
-        return <FlashcardQuiz />; // SỬ DỤNG COMPONENT MỚI CHO MỤC 3
+        return <FlashcardQuiz />;
       default:
         return <MultipleChoice />;
     }
@@ -29,28 +29,26 @@ function App() {
     <div
       className={
         isPixelGame
-          ? "w-screen h-dvh bg-[#FBF8E8] overflow-hidden" // SỬA Ở ĐÂY: Dùng h-dvh (chiều cao viewport) và overflow-hidden
+          ? "flex flex-col h-dvh bg-[#FBF8E8] text-stone-900 font-sans" // Đổi thành h-dvh để có chiều cao viewport chính xác
           : "flex flex-col min-h-screen bg-stone-100 text-stone-900 font-sans"
       }
     >
-      {!isPixelGame && (
-        <Header
-          activeSection={activeSection}
-          setActiveSection={setActiveSection}
-        />
-      )}
+      <Header
+        activeSection={activeSection}
+        setActiveSection={setActiveSection}
+      />
 
       <main
         className={
           isPixelGame
-            ? "w-full h-full lg:overflow-hidden overflow-auto" // SỬA Ở ĐÂY: Cho phép cuộn trên mobile, ẩn trên desktop
-            : "flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12" // Layout web
+            ? "flex-grow w-full overflow-hidden" // SỬA ĐỔI CHÍNH: "overflow-auto" -> "overflow-hidden"
+            : "flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12"
         }
       >
         {renderMainContent()}
       </main>
 
-      {!isPixelGame && <Footer />}
+      <Footer />
     </div>
   );
 }

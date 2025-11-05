@@ -42,9 +42,10 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
   };
 
   const handleCharacterChange = (index: number, characterId: string) => {
-    if (playerCharacters.includes(characterId) && playerCharacters[index] !== characterId) {
-      return;
-    }
+    // SỬA Ở ĐÂY: Xóa logic kiểm tra nhân vật đã được chọn
+    // if (playerCharacters.includes(characterId) && playerCharacters[index] !== characterId) {
+    //   return;
+    // }
 
     const newCharacters = [...playerCharacters];
     newCharacters[index] = newCharacters[index] === characterId ? '' : characterId;
@@ -80,7 +81,7 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
 
   // ✅ return nằm ở thân chính của component
   return (
-    <div className="min-h-screen w-screen p-4 flex flex-col items-center justify-center gap-8">
+    <div className="h-full w-full p-4 flex flex-col items-center justify-center gap-8 overflow-auto">
       <h1
         className="text-4xl md:text-5xl font-pixel text-black text-center leading-tight"
         style={{ textShadow: '4px 4px 0 #fff, 8px 8px 0 #000' }}
@@ -99,7 +100,7 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
         </div>
 
         <div className="w-full space-y-4">
-          <h2 className="text-xl font-pixel text-center">TÙY CHỈNH NGƯỜI CHƠI</h2>
+          <h2 className="text-xl font-pixel text-center">TÙY CHỈNH NGƯỜC CHƠI</h2>
           {Array.from({ length: selectedPlayers }).map((_, index) => (
             <div
               key={index}
@@ -125,18 +126,20 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
                 <div className="w-full grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {CHARACTERS.map((char) => {
                     const isSelected = playerCharacters[index] === char.id;
-                    const isTaken = playerCharacters.includes(char.id) && !isSelected;
+                    // SỬA Ở ĐÂY: Xóa biến isTaken
+                    // const isTaken = playerCharacters.includes(char.id) && !isSelected;
 
                     return (
                       <button
                         key={char.id}
                         onClick={() => handleCharacterChange(index, char.id)}
-                        disabled={isTaken}
+                        // disabled={isTaken} // SỬA Ở ĐÂY: Xóa prop disabled
                         className={`p-1 rounded-md transition-all duration-150 ${
                           isSelected
                             ? 'border-4 border-yellow-400 transform scale-105 shadow-lg'
                             : 'border-4 border-transparent'
-                        } ${isTaken ? 'opacity-40 cursor-not-allowed' : 'hover:border-yellow-200'}`}
+                        } 
+                        hover:border-yellow-200`} // SỬA Ở ĐÂY: Xóa logic class của isTaken
                       >
                         <img
                           src={char.cardImg}
