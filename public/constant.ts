@@ -1,6 +1,4 @@
-
 import { Character, Square, SquareType } from '../src/types/type';
-
 
 export const PLAYER_COLORS = ['#ef4444', '#3b82f6', '#22c55e', '#eab308'];
 
@@ -41,56 +39,60 @@ export const CHARACTER_MAP: Record<string, Character> = CHARACTERS.reduce(
 
 // New color palette inspired by the reference image
 const PALETTE = {
-  PINK: '#ec4899', // Hot Pink
-  CYAN: '#22d3ee', // Bright Cyan
-  ORANGE: '#f97316', // Vibrant Orange
-  LIME: '#84cc16', // Lime Green
-  RED: '#dc2626', // Strong Red
-  YELLOW: '#f59e0b', // Sunny Yellow
-  BLUE: '#6366f1', // Indigo
-  PURPLE: '#a855f7', // Purple
-  GRAY: '#6b7280', // Gray
+  CORNER_ORANGE: '#f59e0b',
+  LABOR_PINK: '#ec4899',
+  CASINO_RED: '#dc2626',
+  MARKET_GREEN: '#84cc16',
+  EVENT_GREEN: '#22c55e',
+  MATERIAL_RED: '#f97316',
+  EVENT_BLUE: '#3b82f6',
+  CORNER_GREEN: '#166534',
+  CORNER_PINK: '#be185d',
+  GRAY: '#6b7280', // Fallback
 };
 
 export const BOARD_SQUARES: Square[] = [
-  { id: 0, name: 'Sản xuất Khởi nghiệp', type: SquareType.CORNER, color: PALETTE.GRAY, description: 'Điểm khởi đầu của mọi nhà tư bản.' },
-  { id: 1, name: 'Mua Máy Móc', type: SquareType.PRODUCTION, color: PALETTE.PINK, description: 'Trả 10 chip để có tư liệu sản xuất.' },
-  { id: 2, name: 'Thuê Công Nhân', type: SquareType.PRODUCTION, color: PALETTE.PINK, description: 'Trả 5 chip để có sức lao động.' },
-  { id: 3, name: 'Cơ Hội', type: SquareType.EVENT, color: PALETTE.CYAN, description: 'Một sự kiện bất ngờ có thể thay đổi tất cả.' },
-  { id: 4, name: 'Bán Hàng Có Lãi', type: SquareType.MARKET, color: PALETTE.YELLOW, description: 'Bán sản phẩm, nhận 20 chip.' },
-  { id: 5, name: 'Đầu Tư Chứng Khoán', type: SquareType.CASINO, color: PALETTE.RED, description: 'Mạo hiểm với thị trường tài chính.' },
-  { id: 6, name: 'Chi Phí Sản Xuất', type: SquareType.PRODUCTION, color: PALETTE.PINK, description: 'Trả 10 chip cho chi phí vận hành.' },
-  { id: 7, name: 'Vận Rủi', type: SquareType.EVENT, color: PALETTE.ORANGE, description: 'Một sự kiện bất ngờ có thể thay đổi tất cả.' },
-  { id: 8, name: 'Mua Nguyên Liệu', type: SquareType.PRODUCTION, color: PALETTE.CYAN, description: 'Trả 10 chip để có tư liệu sản xuất.' },
-  { id: 9, name: 'Thuê Công Nhân', type: SquareType.PRODUCTION, color: PALETTE.CYAN, description: 'Trả 5 chip để có sức lao động.' },
-  { id: 10, name: 'Khủng Hoảng Kinh Tế', type: SquareType.CORNER, color: PALETTE.GRAY, description: 'Chu kỳ tất yếu. Mất 15 chip hoặc nghỉ 1 lượt.' },
-  { id: 11, name: 'Bán Siêu Lợi Nhuận', type: SquareType.MARKET, color: PALETTE.YELLOW, description: 'Bán sản phẩm, nhận 25 chip.' },
-  { id: 12, name: 'Bong Bóng BĐS', type: SquareType.CASINO, color: PALETTE.RED, description: 'Cơ hội và rủi ro từ nhà đất.' },
-  { id: 13, name: 'Mua Nguyên Liệu', type: SquareType.PRODUCTION, color: PALETTE.ORANGE, description: 'Trả 10 chip để có tư liệu sản xuất.' },
-  { id: 14, name: 'Thuê Công Nhân', type: SquareType.PRODUCTION, color: PALETTE.ORANGE, description: 'Trả 5 chip để có sức lao động.' },
-  { id: 15, name: 'Trúng Đậm!', type: SquareType.CASINO, color: PALETTE.RED, description: 'Vận may mỉm cười.' },
-  { id: 16, 'name': 'Sự Kiện Bất Ngờ', type: SquareType.EVENT, color: PALETTE.BLUE, description: 'Một sự kiện bất ngờ có thể thay đổi tất cả.' },
-  { id: 17, 'name': 'Bán Ra Nước Ngoài', type: SquareType.MARKET, color: PALETTE.YELLOW, description: 'Bán sản phẩm, nhận 30 chip.' },
-  { id: 18, 'name': 'Mua Nguyên Liệu', type: SquareType.PRODUCTION, color: PALETTE.LIME, description: 'Trả 10 chip để có tư liệu sản xuất.' },
-  { id: 19, 'name': 'Thuê Công Nhân', type: SquareType.PRODUCTION, color: PALETTE.LIME, description: 'Trả 5 chip để có sức lao động.' },
-  { id: 20, 'name': 'Cách Mạng Công Nhân', type: SquareType.CORNER, color: PALETTE.GRAY, description: 'Tư sản > 70 chip phải chia 10 chip cho người < 40 chip.' },
-  { id: 21, 'name': 'Cơ Hội', type: SquareType.EVENT, color: PALETTE.CYAN, description: 'Một sự kiện bất ngờ có thể thay đổi tất cả.' },
-  { id: 22, 'name': 'Đầu Cơ Tích Trữ', type: SquareType.CASINO, color: PALETTE.RED, description: 'Mạo hiểm với thị trường tài chính.' },
-  { id: 23, 'name': 'Mua Nguyên Liệu', type: SquareType.PRODUCTION, color: PALETTE.PURPLE, description: 'Trả 10 chip để có tư liệu sản xuất.' },
-  { id: 24, 'name': 'Thuê Công Nhân', type: SquareType.PRODUCTION, color: PALETTE.PURPLE, description: 'Trả 5 chip để có sức lao động.' },
-  { id: 25, 'name': 'Thị Trường Bão Hòa', type: SquareType.MARKET, color: PALETTE.YELLOW, description: 'Cung vượt cầu. Bán chỉ được 15 chip.' },
-  { id: 26, 'name': 'Đầu Tư Thất Bại', type: SquareType.CASINO, color: PALETTE.RED, description: 'Mất trắng 15 chip.' },
-  { id: 27, 'name': 'Mua Nguyên Liệu', type: SquareType.PRODUCTION, color: PALETTE.BLUE, description: 'Trả 10 chip để có tư liệu sản xuất.' },
-  { id: 28, 'name': 'Thuê Công Nhân', type: SquareType.PRODUCTION, color: PALETTE.BLUE, description: 'Trả 5 chip để có sức lao động.' },
-  { id: 29, 'name': 'Bán Hàng Có Lãi', type: SquareType.MARKET, color: PALETTE.YELLOW, description: 'Bán sản phẩm, nhận 20 chip.' },
-  { id: 30, 'name': 'Nhà Nước Điều Tiết', type: SquareType.CORNER, color: PALETTE.GRAY, description: 'Người > 80 chip bị thu 10 chip, chia cho người nghèo nhất.' },
-  { id: 31, 'name': 'Thoái Vốn', type: SquareType.CASINO, color: PALETTE.RED, description: 'Mạo hiểm với thị trường tài chính.' },
-  { id: 32, 'name': 'Mua Nguyên Liệu', type: SquareType.PRODUCTION, color: PALETTE.ORANGE, description: 'Trả 10 chip để có tư liệu sản xuất.' },
-  { id: 33, 'name': 'Thuê Công Nhân', type: SquareType.PRODUCTION, color: PALETTE.ORANGE, description: 'Trả 5 chip để có sức lao động.' },
-  { id: 34, 'name': 'Cơ Hội', type: SquareType.EVENT, color: PALETTE.CYAN, description: 'Một sự kiện bất ngờ có thể thay đổi tất cả.' },
-  { id: 35, 'name': 'Bán Hàng Có Lãi', type: SquareType.MARKET, color: PALETTE.YELLOW, description: 'Bán sản phẩm, nhận 20 chip.' },
-  { id: 36, 'name': 'Vận Rủi', type: SquareType.EVENT, color: PALETTE.ORANGE, description: 'Một sự kiện bất ngờ có thể thay đổi tất cả.' },
-  { id: 37, 'name': 'Mua Máy Móc', type: SquareType.PRODUCTION, color: PALETTE.LIME, description: 'Trả 10 chip để có tư liệu sản xuất.' },
-  { id: 38, 'name': 'Cờ Bạc Tài Chính', type: SquareType.CASINO, color: PALETTE.RED, description: 'Mạo hiểm với thị trường tài chính.' },
-  { id: 39, 'name': 'Thuê Công Nhân', type: SquareType.PRODUCTION, color: PALETTE.LIME, description: 'Trả 5 chip để có sức lao động.' },
+  // Side 1: Bottom to Right
+  { id: 0, name: 'Khởi Nghiệp', type: SquareType.CORNER, color: PALETTE.CORNER_ORANGE, description: 'Điểm bắt đầu. Đi qua đây nhận 10 chip tiền lương.', icon: '💼' },
+  { id: 1, name: 'Lao Động', type: SquareType.PRODUCTION, color: PALETTE.LABOR_PINK, description: 'Trả 5 chip để nhận 1 Thẻ Lao động.', icon: '🪚' },
+  { id: 2, name: 'Casino', type: SquareType.CASINO, color: PALETTE.CASINO_RED, description: 'Cược chip và thử vận may với xúc xắc!', icon: '🎰',
+    multipliers: { win: 2, bigWin: 3 }
+  },
+  { id: 3, name: 'Thị Trường', type: SquareType.MARKET, color: PALETTE.MARKET_GREEN, description: 'Bán 1 bộ (Nguyên liệu + Lao động) để nhận 20 chip.', icon: '🚂' },
+  { id: 4, name: 'Vận Mệnh', type: SquareType.EVENT, color: PALETTE.EVENT_GREEN, description: 'Rút một thẻ sự kiện Vận Mệnh.', icon: '🍀', subType: 'van_menh' },
+  { id: 5, name: 'Nguyên Liệu', type: SquareType.PRODUCTION, color: PALETTE.MATERIAL_RED, description: 'Trả 10 chip để nhận 1 Thẻ Nguyên liệu.', icon: '🪵' },
+  { id: 6, name: 'Thời Cuộc', type: SquareType.EVENT, color: PALETTE.EVENT_BLUE, description: 'Rút một thẻ sự kiện Thời Cuộc.', icon: '🎲', subType: 'thoi_cuoc' },
+  
+  // Side 2: Right to Top
+  { id: 7, name: 'Cách Mạng Công Nhân', type: SquareType.CORNER, color: PALETTE.CORNER_GREEN, description: 'San bằng khoảng cách! Đội nhiều chip nhất chia 10 chip cho đội ít chip nhất.', icon: '🚧' },
+  { id: 8, name: 'Nguyên Liệu', type: SquareType.PRODUCTION, color: PALETTE.MATERIAL_RED, description: 'Trả 10 chip để nhận 1 Thẻ Nguyên liệu.', icon: '🦀' },
+  { id: 9, name: 'Thời Cuộc', type: SquareType.EVENT, color: PALETTE.EVENT_BLUE, description: 'Rút một thẻ sự kiện Thời Cuộc.', icon: '🎲', subType: 'thoi_cuoc' },
+  { id: 10, name: 'Casino', type: SquareType.CASINO, color: PALETTE.CASINO_RED, description: 'Cược chip và thử vận may với xúc xắc!', icon: '🎰',
+    multipliers: { win: 2, bigWin: 3 }
+  },
+  { id: 11, name: 'Lao Động', type: SquareType.PRODUCTION, color: PALETTE.LABOR_PINK, description: 'Trả 5 chip để nhận 1 Thẻ Lao động.', icon: '👷' },
+  { id: 12, name: 'Vận Mệnh', type: SquareType.EVENT, color: PALETTE.EVENT_GREEN, description: 'Rút một thẻ sự kiện Vận Mệnh.', icon: '🍀', subType: 'van_menh' },
+  { id: 13, name: 'Thị Trường', type: SquareType.MARKET, color: PALETTE.MARKET_GREEN, description: 'Bán 1 bộ (Nguyên liệu + Lao động) để nhận 20 chip.', icon: '⚓' },
+  
+  // Side 3: Top to Left
+  { id: 14, name: 'Nhà Nước Can Thiệp', type: SquareType.CORNER, color: PALETTE.CORNER_PINK, description: 'Tái phân phối! Đội nhiều chip nhất phải trả 10 chip cho Ngân hàng.', icon: '⚖️' },
+  { id: 15, name: 'Casino', type: SquareType.CASINO, color: PALETTE.CASINO_RED, description: 'Cược chip và thử vận may với xúc xắc!', icon: '🎰',
+    multipliers: { win: 2, bigWin: 3 }
+  },
+  { id: 16, name: 'Nguyên Liệu', type: SquareType.PRODUCTION, color: PALETTE.MATERIAL_RED, description: 'Trả 10 chip để nhận 1 Thẻ Nguyên liệu.', icon: '📦' },
+  { id: 17, name: 'Vận Mệnh', type: SquareType.EVENT, color: PALETTE.EVENT_GREEN, description: 'Rút một thẻ sự kiện Vận Mệnh.', icon: '🍀', subType: 'van_menh' },
+  { id: 18, name: 'Thị Trường', type: SquareType.MARKET, color: PALETTE.MARKET_GREEN, description: 'Bán 1 bộ (Nguyên liệu + Lao động) để nhận 20 chip.', icon: '⛲' },
+  { id: 19, name: 'Lao Động', type: SquareType.PRODUCTION, color: PALETTE.LABOR_PINK, description: 'Trả 5 chip để nhận 1 Thẻ Lao động.', icon: '👷' },
+  { id: 20, name: 'Thời Cuộc', type: SquareType.EVENT, color: PALETTE.EVENT_BLUE, description: 'Rút một thẻ sự kiện Thời Cuộc.', icon: '🎲', subType: 'thoi_cuoc' },
+  
+  // Side 4: Left to Bottom
+  { id: 21, name: 'Khủng Hoảng Kinh Tế', type: SquareType.CORNER, color: PALETTE.CORNER_ORANGE, description: 'Vận rủi ập đến! Mất ngay 20 chip.', icon: '💥' },
+  { id: 22, name: 'Vận Mệnh', type: SquareType.EVENT, color: PALETTE.EVENT_GREEN, description: 'Rút một thẻ sự kiện Vận Mệnh.', icon: '🍀', subType: 'van_menh' },
+  { id: 23, name: 'Casino', type: SquareType.CASINO, color: PALETTE.CASINO_RED, description: 'Cược chip và thử vận may với xúc xắc!', icon: '🎰',
+    multipliers: { win: 2, bigWin: 3 }
+  },
+  { id: 24, name: 'Thị Trường', type: SquareType.MARKET, color: PALETTE.MARKET_GREEN, description: 'Bán 1 bộ (Nguyên liệu + Lao động) để nhận 20 chip.', icon: '⛵' },
+  { id: 25, name: 'Thời Cuộc', type: SquareType.EVENT, color: PALETTE.EVENT_BLUE, description: 'Rút một thẻ sự kiện Thời Cuộc.', icon: '🎲', subType: 'thoi_cuoc' },
+  { id: 26, name: 'Nguyên Liệu', type: SquareType.PRODUCTION, color: PALETTE.MATERIAL_RED, description: 'Trả 10 chip để nhận 1 Thẻ Nguyên liệu.', icon: '💰' },
+  { id: 27, name: 'Lao Động', type: SquareType.PRODUCTION, color: PALETTE.LABOR_PINK, description: 'Trả 5 chip để nhận 1 Thẻ Lao động.', icon: '🌾' },
 ];

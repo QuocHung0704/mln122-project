@@ -29,7 +29,7 @@ function App() {
     <div
       className={
         isPixelGame
-          ? "w-screen h-screen bg-[#FBF8E8]"
+          ? "w-screen h-dvh bg-[#FBF8E8] overflow-hidden" // SỬA Ở ĐÂY: Dùng h-dvh (chiều cao viewport) và overflow-hidden
           : "flex flex-col min-h-screen bg-stone-100 text-stone-900 font-sans"
       }
     >
@@ -43,7 +43,7 @@ function App() {
       <main
         className={
           isPixelGame
-            ? "w-full h-full"
+            ? "w-full h-full lg:overflow-hidden overflow-auto" // SỬA Ở ĐÂY: Cho phép cuộn trên mobile, ẩn trên desktop
             : "flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12" // Layout web
         }
       >

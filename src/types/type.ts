@@ -1,4 +1,5 @@
 
+
 export enum SquareType {
   PRODUCTION = 'PRODUCTION',
   MARKET = 'MARKET',
@@ -6,6 +7,14 @@ export enum SquareType {
   CORNER = 'CORNER',
   EVENT = 'EVENT',
 }
+
+export interface Character {
+  id: string;
+  name: string;
+  img: string;
+  cardImg: string;
+}
+
 
 export interface Square {
   id: number;
@@ -15,15 +24,13 @@ export interface Square {
   description: string;
   icon: string;
   subType?: 'thoi_cuoc' | 'van_menh';
-  betOptions?: number[];
+  backgroundUrl?: string;
+  backgroundColor?: string;
+  // Fix: Add optional multipliers for Casino squares
   multipliers?: {
     win: number;
     bigWin: number;
-    jackpot: number;
-    jackpotRoll?: [number, number];
   };
-  backgroundUrl?: string;
-  backgroundColor?: string;
 }
 
 export interface PlayerStats {
@@ -31,7 +38,6 @@ export interface PlayerStats {
   goodsSold: number;
   combosHit: number;
   casinoNet: number;
-  jackpotsWon: number;
   casinoWins: number;
   casinoLosses: number;
   casinoTotalWagered: number;
@@ -97,5 +103,4 @@ export interface TradeOffer {
 export interface CasinoBetResult {
     betCost: number;
     winnings: number;
-    jackpotWon: boolean;
 }

@@ -1,13 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Square, Player, CasinoBetResult } from '../../types/type';
 
-interface CasinoModalProps {
-    square: Square;
-    player: Player;
-    jackpot: number;
-    onClose: (result: CasinoBetResult | null) => void;
-}
-
+// Dice sub-component remains the same
 const Dice: React.FC<{ value: number }> = ({ value }) => {
     const positions: { [key: number]: string[] } = {
         1: ['center'],
@@ -36,48 +30,30 @@ const Dice: React.FC<{ value: number }> = ({ value }) => {
     );
 };
 
+// Define new types for betting
+type BetTier = 5 | 10 | 15;
+type BetType = 'odd' | 'even' | 'small' | 'big' | 1 | 2 | 3 | 4 | 5 | 6;
 
-const CasinoModal: React.FC<CasinoModalProps> = ({ square, player, jackpot, onClose }) => {
-    const [view, setView] = useState<'selection' | 'rolling' | 'result'>('selection');
+// Fix: Define CasinoModalProps interface
+interface CasinoModalProps {
+    square: Square;
+    player: Player;
+    onClose: (result: CasinoBetResult | null) => void;
+}
+
+const CasinoModal: React.FC<CasinoModalProps> = ({ square, player, onClose }) => {
+    const [view, setView] = useState<'selection' | 'betting' | 'rolling' | 'result'>('selection');
+    const [betTier, setBetTier] = useState<BetTier | null>(null);
     const [animatedDice, setAnimatedDice] = useState<[number, number]>([1, 1]);
     const [dice, setDice] = useState<[number, number]>([1, 1]);
     const [betResult, setBetResult] = useState<CasinoBetResult | null>(null);
     const [resultMessage, setResultMessage] = useState<React.ReactNode>('');
-    const [animatedJackpot, setAnimatedJackpot] = useState(0);
-    const [isJackpotAnimationComplete, setIsJackpotAnimationComplete] = useState(false);
     
-    const betOptions = square.betOptions || [5, 10, 15, 20];
-    const multipliers = square.multipliers || { win: 2, bigWin: 3, jackpot: 5 };
-    const jackpotRoll = square.multipliers?.jackpotRoll || [6, 6];
+    const multipliers = square.multipliers || { win: 2, bigWin: 3 };
 
-    useEffect(() => {
-        setIsJackpotAnimationComplete(false);
-        const animationDuration = 700;
-        const frameDuration = 1000 / 60; // 60fps
-        const totalFrames = Math.round(animationDuration / frameDuration);
-        let frame = 0;
+    const handlePlaceBet = (placedBetType: BetType) => {
+        if (!betTier || player.chips < betTier) return;
 
-        const easeOutQuad = (t: number) => t * (2 - t);
-
-        const counter = setInterval(() => {
-            frame++;
-            const progress = easeOutQuad(frame / totalFrames);
-            const currentValue = Math.round(jackpot * progress);
-            setAnimatedJackpot(currentValue);
-
-            if (frame === totalFrames) {
-                clearInterval(counter);
-                setAnimatedJackpot(jackpot); // Ensure it ends on the exact value
-                setIsJackpotAnimationComplete(true);
-            }
-        }, frameDuration);
-
-        return () => clearInterval(counter);
-    }, [jackpot]);
-
-
-    const handleBet = (betCost: number) => {
-        if (player.chips < betCost) return;
         setView('rolling');
 
         const rollInterval = setInterval(() => {
@@ -94,29 +70,40 @@ const CasinoModal: React.FC<CasinoModalProps> = ({ square, player, jackpot, onCl
             setDice([d1, d2]);
 
             const total = d1 + d2;
-            const jackpotWon = (d1 === jackpotRoll[0] && d2 === jackpotRoll[1]) || (d1 === jackpotRoll[1] && d2 === jackpotRoll[0]);
 
             let winnings = 0;
-            if (jackpotWon) {
-                winnings = betCost * multipliers.jackpot; 
-                setResultMessage(
-                     <div className="animate-text-glow">
-                        <p className="text-3xl">🎉 JACKPOT! 🎉</p>
-                        <p className="text-lg mt-2">Thắng {winnings} chip & hũ {jackpot} chip!</p>
-                    </div>
-                );
-            } else if (total >= 10) {
-                winnings = betCost * multipliers.bigWin;
-                setResultMessage(`THẮNG LỚN! +${winnings - betCost} chip`);
-            } else if (total >= 7) {
-                winnings = betCost * multipliers.win;
-                setResultMessage(`Thắng! +${winnings - betCost} chip`);
-            } else {
-                winnings = 0;
-                setResultMessage(`Thua! -${betCost} chip`);
+            let msg: React.ReactNode = '';
+
+            switch (placedBetType) {
+                case 'odd':
+                    if (total % 2 !== 0) winnings = betTier * multipliers.win;
+                    break;
+                case 'even':
+                    if (total % 2 === 0) winnings = betTier * multipliers.win;
+                    break;
+                case 'small':
+                    if (total >= 2 && total <= 6) winnings = betTier * multipliers.win;
+                    else if (total === 7) msg = "Tổng là 7! Cược Xỉu thua!";
+                    break;
+                case 'big':
+                    if (total >= 8 && total <= 12) winnings = betTier * multipliers.win;
+                    else if (total === 7) msg = "Tổng là 7! Cược Tài thua!";
+                    break;
+                default: // Betting on a specific number (1-6)
+                    const hits = (d1 === placedBetType ? 1 : 0) + (d2 === placedBetType ? 1 : 0);
+                    if (hits === 1) winnings = betTier * multipliers.win;
+                    if (hits === 2) winnings = betTier * multipliers.bigWin;
+                    break;
+            }
+            if (winnings > 0) {
+                msg = `Thắng! +${winnings - betTier} chip`;
+            } else if (msg === '') {
+                msg = `Thua! -${betTier} chip`;
             }
 
-            const result: CasinoBetResult = { betCost, winnings, jackpotWon };
+
+            setResultMessage(msg);
+            const result: CasinoBetResult = { betCost: betTier, winnings };
             setBetResult(result);
             setView('result');
         }, 1500);
@@ -132,21 +119,14 @@ const CasinoModal: React.FC<CasinoModalProps> = ({ square, player, jackpot, onCl
     
     const renderSelectionView = () => (
          <>
-            <p className="font-pixel text-lg">Hũ Jackpot Hiện tại: 
-                <span 
-                    className={`inline-block text-yellow-500 text-2xl ${isJackpotAnimationComplete ? 'animate-jackpot-glow' : ''}`}
-                    style={{textShadow: '2px 2px 0 #000'}}
-                >
-                    ${animatedJackpot}
-                </span>
-            </p>
-            <p className="text-sm my-4">Chọn mức cược và tung xúc xắc. Tung được {jackpotRoll[0]} và {jackpotRoll[1]} để trúng Jackpot!</p>
-            <div className="grid grid-cols-2 gap-4 my-6">
-                {betOptions.map(bet => {
-                    const canAfford = player.chips >= bet;
+            <p className="font-pixel text-lg">Chào mừng tới Casino!</p>
+            <p className="text-sm my-4">Chọn mức cược để thử vận may của bạn.</p>
+            <div className="space-y-3 my-6">
+                {([5, 10, 15] as BetTier[]).map(tier => {
+                    const canAfford = player.chips >= tier;
                     return (
-                        <button key={bet} onClick={() => handleBet(bet)} disabled={!canAfford || view !== 'selection'} className="w-full pixel-button-color bg-red-500 text-white font-pixel py-3 disabled:bg-gray-500">
-                            Cược {bet}
+                        <button key={tier} onClick={() => { setBetTier(tier); setView('betting'); }} disabled={!canAfford} className="w-full pixel-button-color bg-red-500 text-white font-pixel py-3 disabled:bg-gray-500">
+                            Cược {tier} Chip
                         </button>
                     )
                 })}
@@ -157,6 +137,42 @@ const CasinoModal: React.FC<CasinoModalProps> = ({ square, player, jackpot, onCl
         </>
     );
     
+    const renderBettingView = () => {
+        let options: { type: BetType, label: string }[] = [];
+        switch (betTier) {
+            case 5:
+                options = [{ type: 'odd', label: 'Tổng Lẻ' }, { type: 'even', label: 'Tổng Chẵn' }];
+                break;
+            case 10:
+                options = [
+                    { type: 'odd', label: 'Tổng Lẻ' }, { type: 'even', label: 'Tổng Chẵn' },
+                    { type: 'small', label: 'Xỉu (Tổng 2-6)' }, { type: 'big', label: 'Tài (Tổng 8-12)' }
+                ];
+                break;
+            case 15:
+                options = [1, 2, 3, 4, 5, 6].map(n => ({ type: n as BetType, label: `Mặt ${n}` }));
+                break;
+             default: return null;
+        }
+
+        return (
+            <>
+                <div className="flex justify-between items-center mb-4">
+                    <button onClick={() => setView('selection')} className="pixel-button text-xs py-1 px-2">‹ Quay lại</button>
+                    <h3 className="font-pixel text-lg">Cược {betTier} Chip</h3>
+                    <div className="w-14"></div>
+                </div>
+                <div className={`grid ${betTier === 15 ? 'grid-cols-3' : 'grid-cols-2'} gap-3`}>
+                    {options.map(opt => (
+                        <button key={opt.label} onClick={() => handlePlaceBet(opt.type)} className="w-full pixel-button-color bg-red-400 text-white font-pixel py-3 text-sm">
+                            {opt.label}
+                        </button>
+                    ))}
+                </div>
+            </>
+        );
+    };
+
      const renderRollingView = () => (
         <>
             <p className="text-xl font-pixel my-4 animate-pulse">Đang tung xúc xắc...</p>
@@ -169,7 +185,7 @@ const CasinoModal: React.FC<CasinoModalProps> = ({ square, player, jackpot, onCl
 
     const renderResultView = () => {
         const netChange = betResult ? betResult.winnings - betResult.betCost : 0;
-        const finalMessageColor = netChange > 0 ? 'text-green-600' : (betResult?.jackpotWon ? 'text-yellow-500' : 'text-red-600');
+        const finalMessageColor = netChange > 0 ? 'text-green-600' : 'text-red-600';
 
         return (
             <>
@@ -177,7 +193,7 @@ const CasinoModal: React.FC<CasinoModalProps> = ({ square, player, jackpot, onCl
                     <Dice value={dice[0]} />
                     <Dice value={dice[1]} />
                 </div>
-                <div className={`text-xl font-pixel my-4 ${finalMessageColor}`}>
+                <div className={`text-xl font-pixel my-4 min-h-[70px] flex items-center justify-center ${finalMessageColor}`}>
                     {resultMessage}
                 </div>
                 <button onClick={handleClose} className="w-full pixel-button-color bg-green-500 text-white font-pixel py-3 mt-4">
@@ -189,6 +205,7 @@ const CasinoModal: React.FC<CasinoModalProps> = ({ square, player, jackpot, onCl
     
     const renderContent = () => {
         switch(view) {
+            case 'betting': return renderBettingView();
             case 'rolling': return renderRollingView();
             case 'result': return renderResultView();
             case 'selection':
@@ -201,7 +218,7 @@ const CasinoModal: React.FC<CasinoModalProps> = ({ square, player, jackpot, onCl
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="pixel-panel p-6 text-center w-full max-w-md mx-4 animate-scale-in">
                 <h2 className="text-2xl font-pixel text-red-600 mb-2">{square.name} {square.icon}</h2>
-                <div className="pixel-panel-inset p-4 min-h-[250px] flex flex-col justify-center">
+                <div className="pixel-panel-inset p-4 min-h-[280px] flex flex-col justify-center">
                    {renderContent()}
                 </div>
             </div>
