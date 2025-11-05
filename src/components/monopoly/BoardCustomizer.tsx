@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Square, SquareType } from '../../types/type';
-import { BOARD_SQUARES } from '../../..//public/constant';
+import { BOARD_SQUARES } from '../../../public/constant';
 
 interface BoardCustomizerProps {
     board: Square[];
@@ -46,26 +46,12 @@ const BoardCustomizer: React.FC<BoardCustomizerProps> = ({ board, layout, onSave
         );
     };
 
-    const handleMultiplierChange = (key: 'win' | 'bigWin' | 'jackpot', value: string) => {
+    const handleMultiplierChange = (key: 'win' | 'bigWin', value: string) => {
         if (!selectedSquare) return;
-        const currentMultipliers = selectedSquare.multipliers || { win: 2, bigWin: 3, jackpot: 5, jackpotRoll: [6, 6] };
+        const currentMultipliers = selectedSquare.multipliers || { win: 2, bigWin: 3 };
         const newMultipliers = {
             ...currentMultipliers,
             [key]: parseFloat(value) || 0,
-        };
-        handleUpdateSquare(selectedSquare.id, { multipliers: newMultipliers });
-    };
-
-    const handleJackpotRollChange = (index: 0 | 1, value: string) => {
-        if (!selectedSquare) return;
-        const currentMultipliers = selectedSquare.multipliers || { win: 2, bigWin: 3, jackpot: 5, jackpotRoll: [6, 6] };
-        const currentJackpotRoll = currentMultipliers.jackpotRoll || [6, 6];
-        const newJackpotRoll = [...currentJackpotRoll] as [number, number];
-        const parsedValue = parseInt(value, 10);
-        newJackpotRoll[index] = isNaN(parsedValue) ? 1 : Math.max(1, Math.min(6, parsedValue));
-        const newMultipliers = {
-            ...currentMultipliers,
-            jackpotRoll: newJackpotRoll,
         };
         handleUpdateSquare(selectedSquare.id, { multipliers: newMultipliers });
     };
@@ -127,13 +113,6 @@ const BoardCustomizer: React.FC<BoardCustomizerProps> = ({ board, layout, onSave
                                             {COLOR_OPTIONS.map(c => <button key={c} onClick={() => handleUpdateSquare(selectedSquare.id, { color: c })} className={`w-full h-8 rounded ${selectedSquare.color === c ? 'ring-2 ring-offset-2 ring-black' : ''}`} style={{ backgroundColor: c }} />)}
                                         </div>
                                     </Field>
-                                    {selectedSquare.type === SquareType.EVENT && (
-                                        <Field label="Màu Nền Ô">
-                                            <div className="grid grid-cols-8 gap-1">
-                                                {COLOR_OPTIONS.map(c => <button key={c} onClick={() => handleUpdateSquare(selectedSquare.id, { backgroundColor: c })} className={`w-full h-8 rounded ${selectedSquare.backgroundColor === c ? 'ring-2 ring-offset-2 ring-black' : ''}`} style={{ backgroundColor: c }} />)}
-                                            </div>
-                                        </Field>
-                                    )}
                                     <Field label="URL Hình nền" htmlFor="square-bg-url">
                                         <input id="square-bg-url" type="text" value={selectedSquare.backgroundUrl || ''} onChange={e => handleUpdateSquare(selectedSquare.id, { backgroundUrl: e.target.value })} className="w-full pixel-panel-inset px-3 py-2 text-sm" />
                                     </Field>
@@ -146,13 +125,8 @@ const BoardCustomizer: React.FC<BoardCustomizerProps> = ({ board, layout, onSave
                                 {selectedSquare.type === SquareType.CASINO && (
                                     <Section title="Casino Settings">
                                         <div className="grid grid-cols-2 gap-x-6 gap-y-3">
-                                            <Field label="Hệ số Thắng (≥7)"><input type="number" step="0.1" value={selectedSquare.multipliers?.win} onChange={e => handleMultiplierChange('win', e.target.value)} className="w-full pixel-panel-inset px-3 py-2 text-sm" /></Field>
-                                            <Field label="Hệ số Thắng Lớn (≥10)"><input type="number" step="0.1" value={selectedSquare.multipliers?.bigWin} onChange={e => handleMultiplierChange('bigWin', e.target.value)} className="w-full pixel-panel-inset px-3 py-2 text-sm" /></Field>
-                                            <Field label="Hệ số Jackpot"><input type="number" step="0.1" value={selectedSquare.multipliers?.jackpot} onChange={e => handleMultiplierChange('jackpot', e.target.value)} className="w-full pixel-panel-inset px-3 py-2 text-sm" /></Field>
-                                            <div className="flex gap-2 items-end">
-                                                <Field label="Jackpot Roll 1"><input type="number" min="1" max="6" value={selectedSquare.multipliers?.jackpotRoll?.[0] || 6} onChange={e => handleJackpotRollChange(0, e.target.value)} className="w-full pixel-panel-inset px-3 py-2 text-sm" /></Field>
-                                                <Field label="Jackpot Roll 2"><input type="number" min="1" max="6" value={selectedSquare.multipliers?.jackpotRoll?.[1] || 6} onChange={e => handleJackpotRollChange(1, e.target.value)} className="w-full pixel-panel-inset px-3 py-2 text-sm" /></Field>
-                                            </div>
+                                            <Field label="Hệ số Thắng"><input type="number" step="0.1" value={selectedSquare.multipliers?.win} onChange={e => handleMultiplierChange('win', e.target.value)} className="w-full pixel-panel-inset px-3 py-2 text-sm" /></Field>
+                                            <Field label="Hệ số Thắng Lớn"><input type="number" step="0.1" value={selectedSquare.multipliers?.bigWin} onChange={e => handleMultiplierChange('bigWin', e.target.value)} className="w-full pixel-panel-inset px-3 py-2 text-sm" /></Field>
                                         </div>
                                     </Section>
                                 )}

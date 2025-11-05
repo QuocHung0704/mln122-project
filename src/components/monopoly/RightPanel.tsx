@@ -1,13 +1,14 @@
 
-import React, { useState, useEffect } from 'react';
+
+import React from 'react';
 import { Player, GamePhase } from '../../types/type';
 import GameLog from './GameLog';
 import CrisisBar from './CrisisBar';
 
 const Dice: React.FC<{ value: number; isRolling: boolean }> = ({ value, isRolling }) => {
-    const [displayValue, setDisplayValue] = useState(value);
+    const [displayValue, setDisplayValue] = React.useState(value);
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (isRolling) {
             const interval = setInterval(() => {
                 setDisplayValue(Math.floor(Math.random() * 6) + 1);
@@ -72,7 +73,7 @@ const Controls: React.FC<{
 
     return (
         <div className="pixel-panel p-3 text-center">
-            <h3 className="font-pixel text-sm mb-2">Lượt của: <span style={{color: currentPlayer.color}}>{currentPlayer.name}</span></h3>
+            <h3 className="font-pixel text-sm mb-2 font-bold">Lượt của: <span style={{color: currentPlayer.color}}>{currentPlayer.name}</span></h3>
             <div className="flex justify-center gap-4 my-3">
                  <Dice value={dice[0]} isRolling={isDiceRolling} />
                  <Dice value={dice[1]} isRolling={isDiceRolling} />
@@ -93,9 +94,7 @@ const Controls: React.FC<{
 interface RightPanelProps {
     round: number;
     crisisLevel: number;
-    jackpot: number;
     log: string[];
-    tradeLog: string[];
     dice: [number, number];
     isDiceRolling: boolean;
     onRollDice: () => void;
@@ -109,11 +108,10 @@ interface RightPanelProps {
 }
 
 const RightPanel: React.FC<RightPanelProps> = (props) => {
-    const [activeTab, setActiveTab] = useState<'events' | 'trades'>('events');
     return (
          <aside id="right-panel" className="h-full pixel-panel p-4 flex flex-col gap-4">
             <div className="flex items-center justify-between">
-                <h2 className="font-pixel text-2xl text-center">
+                <h2 className="font-pixel text-2xl text-center font-bold">
                     Vòng {props.round}/10
                 </h2>
                 <div className="flex items-center gap-2">
@@ -130,12 +128,8 @@ const RightPanel: React.FC<RightPanelProps> = (props) => {
                     <button onClick={props.onShowRules} title="Show Rules" className="w-10 h-10 pixel-button-color bg-yellow-400 flex items-center justify-center font-pixel text-2xl font-bold text-black">?</button>
                 </div>
             </div>
-             <div id="crisis-jackpot-panel" className="grid grid-cols-2 gap-4">
+             <div id="crisis-panel">
                 <CrisisBar crisisLevel={props.crisisLevel} maxLevel={10} />
-                 <div className="p-3 pixel-panel text-center">
-                    <h3 className="text-sm font-pixel mb-2 text-yellow-600">JACKPOT</h3>
-                    <p className="font-pixel text-2xl font-bold text-yellow-500" style={{textShadow: '2px 2px 0 #000'}}>${props.jackpot}</p>
-                </div>
             </div>
             
             <Controls 
@@ -148,22 +142,7 @@ const RightPanel: React.FC<RightPanelProps> = (props) => {
             />
             
             <div id="game-log-panel" className="flex-grow flex flex-col min-h-0">
-                 <div className="flex">
-                    <button 
-                        className={`flex-1 py-2 font-pixel text-sm border-4 border-b-0 border-black text-center ${activeTab === 'events' ? 'bg-white' : 'bg-gray-300'}`}
-                        onClick={() => setActiveTab('events')}
-                    >
-                        SỰ KIỆN
-                    </button>
-                     <button 
-                        className={`flex-1 py-2 font-pixel text-sm border-4 border-b-0 border-l-0 border-black text-center ${activeTab === 'trades' ? 'bg-white' : 'bg-gray-300'}`}
-                        onClick={() => setActiveTab('trades')}
-                    >
-                        GIAO DỊCH
-                    </button>
-                </div>
-                {activeTab === 'events' && <GameLog log={props.log} />}
-                {activeTab === 'trades' && <GameLog log={props.tradeLog} />}
+                <GameLog log={props.log} />
             </div>
 
         </aside>

@@ -382,7 +382,7 @@ const App: React.FC = () => {
             handleNextTutorialStep();
         }
 
-        const currentPlayer = players[currentPlayerIndex];
+        const currentPlayer = players[currentPlayerIndex]; // LẤY currentPlayer TRƯỚC
         if (currentPlayer.missNextTurn) {
             updatePlayerState(currentPlayer.id, { missNextTurn: false });
             addLog(`${currentPlayer.name} phải bỏ lượt.`);
@@ -395,42 +395,36 @@ const App: React.FC = () => {
         setTimeout(() => {
             const d1 = Math.floor(Math.random() * 6) + 1;
             const d2 = Math.floor(Math.random() * 6) + 1;
+            const total = d1 + d2;
+            
+            // CẬP NHẬT GHI LOG VÀ DICE TRƯỚC
             setDice([d1, d2]);
             setIsDiceRolling(false);
+            addLog(`${currentPlayer.name} tung được ${total}.`);
+
+            const oldPosition = currentPlayer.position;
+            const newPosition = (oldPosition + total) % board.length;
             
-            setPlayers(prevPlayers => {
-                const playerIndex = prevPlayers.findIndex(p => p.id === currentPlayer.id);
-                if (playerIndex === -1) return prevPlayers;
-                
-                const playerToMove = prevPlayers[playerIndex];
-                const total = d1 + d2;
-                addLog(`${playerToMove.name} tung được ${total}.`);
+            let chipsUpdate = 0;
+            if (newPosition < oldPosition) {
+                addLog(`${currentPlayer.name} qua vạch đích, nhận 10 chip!`);
+                chipsUpdate = 10;
+            }
 
-                const oldPosition = playerToMove.position;
-                const newPosition = (oldPosition + total) % board.length;
-                
-                let chipsUpdate = 0;
-                if (newPosition < oldPosition) {
-                    addLog(`${playerToMove.name} qua vạch đích, nhận 10 chip!`);
-                    chipsUpdate = 10;
-                }
+            // 1. Cập nhật state của người chơi
+            setPlayers(prevPlayers =>
+                prevPlayers.map(p =>
+                    p.id === currentPlayer.id
+                        ? { ...p, position: newPosition, chips: p.chips + chipsUpdate }
+                        : p
+                )
+            );
+            
+            const nextSquare = board[newPosition];
+            setActiveSquare(nextSquare);
+            setShowSquareInfoModal(true);
+            setGamePhase(GamePhase.ACTION);
 
-                const updatedPlayer = {
-                    ...playerToMove,
-                    position: newPosition,
-                    chips: playerToMove.chips + chipsUpdate
-                };
-
-                const newPlayers = [...prevPlayers];
-                newPlayers[playerIndex] = updatedPlayer;
-
-                const nextSquare = board[newPosition];
-                setActiveSquare(nextSquare);
-                setShowSquareInfoModal(true);
-                setGamePhase(GamePhase.ACTION);
-                
-                return newPlayers;
-            });
         }, 1000);
     };
     
@@ -654,7 +648,7 @@ const App: React.FC = () => {
     }
 
     return (
-        <div id="app-container" className="w-screen h-screen p-4 lg:grid lg:grid-cols-[350px_1fr_350px] gap-4 items-start">
+        <div id="app-container" className="w-full h-full p-4 lg:grid lg:grid-cols-[350px_1fr_350px] gap-4 items-start">
             <PlayerInfo 
                 players={players} 
                 currentPlayerIndex={currentPlayerIndex} 
@@ -662,7 +656,8 @@ const App: React.FC = () => {
                 onInitiateTrade={handleInitiateTrade}
             />
             
-            <main className="w-full h-full flex items-center justify-center">
+            {/* SỬA LẠI THẺ <main> THÀNH <div> VÀ BỎ h-full */}
+            <div className="w-full flex items-center justify-center">
                  {viewMode === 'board' ? (
                     <GameBoard
                         board={board}
@@ -674,7 +669,7 @@ const App: React.FC = () => {
                  ) : (
                     <PlayerStatusView players={players} />
                  )}
-            </main>
+            </div>
             
             <RightPanel 
                 round={round}

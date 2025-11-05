@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CHARACTERS, PLAYER_COLORS } from '../../../public/constant';
+import { CHARACTER_MAP, CHARACTERS, PLAYER_COLORS } from '../../../public/constant';
 
 interface GameSetupProps {
   onStartGame: (playerConfigs: { name: string; icon: string }[], startWithTutorial: boolean) => void;
@@ -52,10 +52,16 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
   };
 
   const handleStartClick = () => {
-    const finalPlayerConfigs = playerCharacters.map((charId, index) => ({
-      name: playerNames[index].trim() === '' ? `Đội ${index + 1}` : playerNames[index].trim(),
-      icon: charId || '',
-    }));
+    // SỬA LẠI LOGIC NÀY
+    const finalPlayerConfigs = playerCharacters.map((charId, index) => {
+      const character = CHARACTER_MAP[charId];
+      const defaultIcon = '♟️'; // Emoji mặc định nếu không chọn
+      return {
+        name: playerNames[index].trim() === '' ? `Đội ${index + 1}` : playerNames[index].trim(),
+        // Lấy icon từ character, nếu không có thì dùng defaultIcon
+        icon: (character ? character.cardImg : defaultIcon) || defaultIcon,
+      };
+    });
     onStartGame(finalPlayerConfigs, startWithTutorial);
   };
 
