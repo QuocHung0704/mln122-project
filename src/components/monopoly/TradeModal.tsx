@@ -1,11 +1,11 @@
 import React, { useState, useMemo } from 'react';
-import { Player, TradeOffer } from '../../types/type';
+import { Player, TradeOffer, TradeAsset } from '../../types/type';
 import PawnIcon from './PawnIcon';
 
 interface TradeModalProps {
     proposer: Player;
     partner: Player;
-    onPropose: (proposal: { offer: TradeOffer['offer'], request: TradeOffer['request'] }) => void;
+    onPropose: (proposal: { offer: TradeAsset, request: TradeAsset }) => void;
     onAccept: () => void;
     onReject: () => void;
     onCancel: () => void;
@@ -31,8 +31,8 @@ const PlayerAssets: React.FC<{ player: Player }> = ({ player }) => (
 
 const TradeInputs: React.FC<{
     player: Player;
-    tradeValues: TradeOffer['offer'];
-    onValuesChange: (newValues: TradeOffer['offer']) => void;
+    tradeValues: TradeAsset;
+    onValuesChange: (newValues: TradeAsset) => void;
 }> = ({ player, tradeValues, onValuesChange }) => {
     return (
         <div className="space-y-3 p-4 pixel-panel">
@@ -74,7 +74,7 @@ const TradeInputs: React.FC<{
     );
 };
 
-const TradeSummary: React.FC<{ title: string, items: TradeOffer['offer'] }> = ({ title, items }) => {
+const TradeSummary: React.FC<{ title: string, items: TradeAsset }> = ({ title, items }) => {
     const hasItems = items.chips > 0 || items.hasRawMaterials || items.hasLabor;
     return (
         <div className="flex-1 p-4 pixel-panel-inset">
@@ -93,8 +93,8 @@ const TradeSummary: React.FC<{ title: string, items: TradeOffer['offer'] }> = ({
 };
 
 const TradeModal: React.FC<TradeModalProps> = ({ proposer, partner, onPropose, onAccept, onReject, onCancel, tradeOffer }) => {
-    const [offer, setOffer] = useState<TradeOffer['offer']>({ chips: 0, hasRawMaterials: false, hasLabor: false });
-    const [request, setRequest] = useState<TradeOffer['request']>({ chips: 0, hasRawMaterials: false, hasLabor: false });
+    const [offer, setOffer] = useState<TradeAsset>({ chips: 0, hasRawMaterials: false, hasLabor: false });
+    const [request, setRequest] = useState<TradeAsset>({ chips: 0, hasRawMaterials: false, hasLabor: false });
     const [isOfferSent, setIsOfferSent] = useState(false);
 
     const validationError = useMemo(() => {
@@ -117,7 +117,7 @@ const TradeModal: React.FC<TradeModalProps> = ({ proposer, partner, onPropose, o
 
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="pixel-panel p-6 w-full max-w-4xl mx-4 flex flex-col text-center">
+            <div className="pixel-panel p-6 w-full max-w-4xl mx-4 flex flex-col text-center animate-scale-in">
                  {!isOfferSent ? ( // PROPOSER'S VIEW
                     <>
                         <h2 className="text-2xl font-pixel text-teal-600 mb-4">TẠO GIAO DỊCH</h2>

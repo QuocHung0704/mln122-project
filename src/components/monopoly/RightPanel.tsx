@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { Player, GamePhase } from '../../types/type';
-import CrisisBar from './CrisisBar';
 import GameLog from './GameLog';
+import CrisisBar from './CrisisBar';
 
 const Dice: React.FC<{ value: number; isRolling: boolean }> = ({ value, isRolling }) => {
     const [displayValue, setDisplayValue] = useState(value);
@@ -29,17 +30,17 @@ const Dice: React.FC<{ value: number; isRolling: boolean }> = ({ value, isRollin
     const pipPositions = positions[displayValue] || [];
 
     return (
-        <div className="w-12 h-12 bg-white border-2 border-black p-1 relative">
+        <div className="w-12 h-12 bg-white rounded-md border-2 border-black p-1 relative shadow-[inset_0_5px_0px_rgba(255,255,255,0.4),_inset_0_-5px_0px_rgba(0,0,0,0.2)]">
             {pipPositions.map(pos => {
                 let posClass = '';
-                if (pos === 'center') posClass = 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2';
-                if (pos === 'top-left') posClass = 'top-1 left-1';
-                if (pos === 'top-right') posClass = 'top-1 right-1';
-                if (pos === 'bottom-left') posClass = 'bottom-1 left-1';
-                if (pos === 'bottom-right') posClass = 'bottom-1 right-1';
-                if (pos === 'middle-left') posClass = 'top-1/2 left-1 -translate-y-1/2';
-                if (pos === 'middle-right') posClass = 'top-1/2 right-1 -translate-y-1/2';
-
+                if(pos === 'center') posClass = 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2';
+                if(pos === 'top-left') posClass = 'top-1.5 left-1.5';
+                if(pos === 'top-right') posClass = 'top-1.5 right-1.5';
+                if(pos === 'bottom-left') posClass = 'bottom-1.5 left-1.5';
+                if(pos === 'bottom-right') posClass = 'bottom-1.5 right-1.5';
+                if(pos === 'middle-left') posClass = 'top-1/2 left-1.5 -translate-y-1/2';
+                if(pos === 'middle-right') posClass = 'top-1/2 right-1.5 -translate-y-1/2';
+                
                 return <div key={pos} className={`absolute w-2 h-2 bg-black rounded-full ${posClass}`}></div>
             })}
         </div>
@@ -61,7 +62,6 @@ const Controls: React.FC<{
         switch (gamePhase) {
             case GamePhase.ROLLING: return currentPlayer.missNextTurn ? 'BỎ LƯỢT' : 'TUNG XÚC XẮC';
             case GamePhase.END_TURN: return 'KẾT THÚC LƯỢT';
-            case GamePhase.TRADING: return 'ĐANG GIAO DỊCH...';
             default: return 'ĐANG CHỜ...';
         }
     }
@@ -72,33 +72,22 @@ const Controls: React.FC<{
 
     return (
         <div className="pixel-panel p-3 text-center">
-            <h3 className="font-pixel text-sm mb-2">Lượt của: <span style={{ color: currentPlayer.color }}>{currentPlayer.name}</span></h3>
+            <h3 className="font-pixel text-sm mb-2">Lượt của: <span style={{color: currentPlayer.color}}>{currentPlayer.name}</span></h3>
             <div className="flex justify-center gap-4 my-3">
-                <Dice value={dice[0]} isRolling={isDiceRolling} />
-                <Dice value={dice[1]} isRolling={isDiceRolling} />
+                 <Dice value={dice[0]} isRolling={isDiceRolling} />
+                 <Dice value={dice[1]} isRolling={isDiceRolling} />
             </div>
             <button
                 id={buttonId}
                 onClick={handleClick}
                 disabled={isDisabled}
-                className="w-full pixel-button-color bg-cyan-500 text-white disabled:bg-gray-500 font-pixel py-3 px-4 text-lg"
+                className="w-full pixel-button-color bg-blue-500 text-white disabled:bg-gray-500 font-pixel py-3 px-4 text-lg text-shadow"
             >
                 {getButtonText()}
             </button>
         </div>
     )
 }
-
-const JackpotDisplay: React.FC<{ amount: number }> = ({ amount }) => (
-    <div className="p-3 pixel-panel text-center bg-gray-900 text-white border-yellow-400">
-        <h3 className="text-sm font-pixel mb-2 text-yellow-400 animate-pulse">
-            CASINO JACKPOT
-        </h3>
-        <p className="font-pixel text-4xl text-green-400" style={{ textShadow: '2px 2px 0px #000' }}>
-            ${amount}
-        </p>
-    </div>
-);
 
 // --- Main Right Panel Component ---
 interface RightPanelProps {
@@ -116,24 +105,40 @@ interface RightPanelProps {
     onShowRules: () => void;
     viewMode: 'board' | 'status';
     onToggleView: () => void;
+    onShowCustomizer: () => void;
 }
 
 const RightPanel: React.FC<RightPanelProps> = (props) => {
+    const [activeTab, setActiveTab] = useState<'events' | 'trades'>('events');
     return (
-        <aside className="h-full pixel-panel p-4 flex flex-col gap-4">
+         <aside id="right-panel" className="h-full pixel-panel p-4 flex flex-col gap-4">
             <div className="flex items-center justify-between">
-                <h2 className="font-pixel text-xl text-center">
+                <h2 className="font-pixel text-2xl text-center">
                     Vòng {props.round}/10
                 </h2>
                 <div className="flex items-center gap-2">
-                    <button onClick={props.onToggleView} className="h-10 px-3 pixel-button-color bg-indigo-500 flex items-center justify-center font-pixel text-xs text-white">
-                        {props.viewMode === 'board' ? 'STATUS' : 'BOARD'}
+                    <button onClick={props.onToggleView} title="Toggle View" className="w-10 h-10 pixel-button-color bg-indigo-500 flex items-center justify-center font-pixel text-xs text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
+                        </svg>
                     </button>
-                    <button onClick={props.onShowRules} className="w-10 h-10 pixel-button-color bg-yellow-400 flex items-center justify-center font-pixel text-xl text-black">?</button>
+                    <button onClick={props.onShowCustomizer} title="Edit Board" className="w-10 h-10 pixel-button-color bg-pink-500 flex items-center justify-center text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L15.232 5.232z" />
+                        </svg>
+                    </button>
+                    <button onClick={props.onShowRules} title="Show Rules" className="w-10 h-10 pixel-button-color bg-yellow-400 flex items-center justify-center font-pixel text-2xl font-bold text-black">?</button>
                 </div>
             </div>
-
-            <Controls
+             <div id="crisis-jackpot-panel" className="grid grid-cols-2 gap-4">
+                <CrisisBar crisisLevel={props.crisisLevel} maxLevel={10} />
+                 <div className="p-3 pixel-panel text-center">
+                    <h3 className="text-sm font-pixel mb-2 text-yellow-600">JACKPOT</h3>
+                    <p className="font-pixel text-2xl font-bold text-yellow-500" style={{textShadow: '2px 2px 0 #000'}}>${props.jackpot}</p>
+                </div>
+            </div>
+            
+            <Controls 
                 onRollDice={props.onRollDice}
                 onEndTurn={props.onEndTurn}
                 gamePhase={props.gamePhase}
@@ -141,15 +146,24 @@ const RightPanel: React.FC<RightPanelProps> = (props) => {
                 dice={props.dice}
                 isDiceRolling={props.isDiceRolling}
             />
-            <div id="crisis-jackpot-panel" className="flex flex-col gap-4">
-                <JackpotDisplay amount={props.jackpot} />
-                <CrisisBar crisisLevel={props.crisisLevel} maxLevel={10} />
-            </div>
-
-            <div className="flex-grow flex flex-col min-h-0 relative"> {/* Thêm relative */}
-                <div className="absolute inset-0 overflow-hidden"> {/* Thêm absolute container */}
-                    <GameLog log={props.log} tradeLog={props.tradeLog} />
+            
+            <div id="game-log-panel" className="flex-grow flex flex-col min-h-0">
+                 <div className="flex">
+                    <button 
+                        className={`flex-1 py-2 font-pixel text-sm border-4 border-b-0 border-black text-center ${activeTab === 'events' ? 'bg-white' : 'bg-gray-300'}`}
+                        onClick={() => setActiveTab('events')}
+                    >
+                        SỰ KIỆN
+                    </button>
+                     <button 
+                        className={`flex-1 py-2 font-pixel text-sm border-4 border-b-0 border-l-0 border-black text-center ${activeTab === 'trades' ? 'bg-white' : 'bg-gray-300'}`}
+                        onClick={() => setActiveTab('trades')}
+                    >
+                        GIAO DỊCH
+                    </button>
                 </div>
+                {activeTab === 'events' && <GameLog log={props.log} />}
+                {activeTab === 'trades' && <GameLog log={props.tradeLog} />}
             </div>
 
         </aside>

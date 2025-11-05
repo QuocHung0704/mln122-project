@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Player, GamePhase, Square, SquareType, EventCard, EffectType, TradeOffer } from '../types/type';
+// Fix: Import TradeOffer and CasinoBetResult from types.ts
+import { Player, GamePhase, Square, SquareType, EventCard, EffectType, TradeOffer, CasinoBetResult } from '../types/type';
 import { BOARD_SQUARES, PLAYER_COLORS } from '../../public/constant';
-import { EVENT_CARDS } from '../config/events';
+import { THOI_CUOC_CARDS, VAN_MENH_CARDS } from '../config/events';
 import GameBoard from '../components/monopoly/GameBoard';
 import PlayerInfo from '../components/monopoly/PlayerInfo';
 import GameOverModal from '../components/monopoly/GameOverModal';
@@ -10,40 +11,65 @@ import GameSetup from '../components/monopoly/GameSetup';
 import TradeModal from '../components/monopoly/TradeModal';
 import RightPanel from '../components/monopoly/RightPanel';
 import CasinoModal from '../components/monopoly/CasinoModal';
-import EventCardModal from '../components/monopoly/EventCardModal';
+import EventDrawModal from '../components/monopoly/EventDrawModal';
 import PlayerStatusView from '../components/monopoly/PlayerStatusView';
 import TutorialGuide from '../components/monopoly/TutorialGuide';
 import { TUTORIAL_STEPS } from '../config/TutorialStep';
+import SquareInfoModal from '../components/monopoly/SquareInfoModal';
+import BoardCustomizer from '../components/monopoly/BoardCustomizer';
 
-interface CasinoBetResult {
-    betCost: number;
-    winnings: number;
-    jackpotWon: boolean;
-}
+// A helper function to shuffle an array, can be placed outside the component
+const shuffleDeck = <T,>(deck: T[]): T[] => {
+    const shuffled = [...deck];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+};
 
-const Monopoly: React.FC = () => {
+const App: React.FC = () => {
     const [players, setPlayers] = useState<Player[]>([]);
     const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
     const [gamePhase, setGamePhase] = useState<GamePhase>(GamePhase.SETUP);
     const [dice, setDice] = useState<[number, number]>([1, 1]);
     const [isDiceRolling, setIsDiceRolling] = useState(false);
     const [log, setLog] = useState<string[]>([]);
-    const [tradeLog, setTradeLog] = useState<string[]>([]);
     const [round, setRound] = useState(1);
     const [showRulesModal, setShowRulesModal] = useState(false);
     const [crisisLevel, setCrisisLevel] = useState(0);
-    const [jackpot, setJackpot] = useState(20);
     const [showTradeModal, setShowTradeModal] = useState(false);
     const [tradeOffer, setTradeOffer] = useState<TradeOffer | null>(null);
     const [showCasinoModal, setShowCasinoModal] = useState(false);
-    const [showEventModal, setShowEventModal] = useState(false);
+    const [showEventDrawModal, setShowEventDrawModal] = useState(false);
     const [activeSquare, setActiveSquare] = useState<Square | null>(null);
     const [currentEvent, setCurrentEvent] = useState<EventCard | null>(null);
     const [viewMode, setViewMode] = useState<'board' | 'status'>('board');
     const [productionFeedback, setProductionFeedback] = useState<{ playerId: number; position: number } | null>(null);
     const [tutorialStep, setTutorialStep] = useState<number | null>(null);
+    const [showSquareInfoModal, setShowSquareInfoModal] = useState(false);
+    const [board, setBoard] = useState<Square[]>(BOARD_SQUARES);
+    const [showBoardCustomizer, setShowBoardCustomizer] = useState(false);
+    const [boardLayout, setBoardLayout] = useState({ squareSize: 8, fontSize: 1.1, boardSize: 70, pageBackground: '' });
+    const [thoiCuocDeck, setThoiCuocDeck] = useState<EventCard[]>([]);
+    const [vanMenhDeck, setVanMenhDeck] = useState<EventCard[]>([]);
 
     const isTutorialActive = tutorialStep !== null;
+    
+    useEffect(() => {
+        if (boardLayout.pageBackground) {
+            document.body.style.backgroundImage = `url(${boardLayout.pageBackground})`;
+            document.body.style.backgroundSize = 'cover';
+            document.body.style.backgroundPosition = 'center';
+            document.body.style.backgroundColor = 'transparent'; // Allow background image to show
+        } else {
+            // Reset to default tiled background from index.html
+            document.body.style.backgroundImage = '';
+            document.body.style.backgroundSize = '';
+            document.body.style.backgroundPosition = '';
+            document.body.style.backgroundColor = 'var(--color-background)';
+        }
+    }, [boardLayout.pageBackground]);
 
     useEffect(() => {
         if (productionFeedback) {
@@ -56,62 +82,53 @@ const Monopoly: React.FC = () => {
         setLog(prev => [message, ...prev.slice(0, 49)]);
     }, []);
 
-    const addTradeLog = useCallback((message: string) => {
-        setTradeLog(prev => [message, ...prev.slice(0, 49)]);
-    }, []);
-
     const updatePlayerState = useCallback((playerId: number, updates: Partial<Player>) => {
         setPlayers(prevPlayers =>
             prevPlayers.map(p => (p.id === playerId ? { ...p, ...updates } : p))
         );
     }, []);
 
-    const handleStartGame = useCallback(
-        (
-          numPlayers: number,
-          playerNames: string[],
-          playerCharacters: string[], 
-          startWithTutorial: boolean,
-        ) => {
-          const initialPlayers: Player[] = [];
-          for (let i = 0; i < numPlayers; i++) {
+    const handleStartGame = useCallback((playerConfigs: { name: string; icon: string }[], startWithTutorial: boolean) => {
+        const numPlayers = playerConfigs.length;
+        const initialPlayers: Player[] = [];
+        for (let i = 0; i < numPlayers; i++) {
             initialPlayers.push({
-              id: i + 1,
-              name: playerNames[i] || `Tư Bản ${i + 1}`,
-              chips: 50,
-              position: 0,
-              color: PLAYER_COLORS[i],
-              icon: playerCharacters[i], 
-              hasRawMaterials: false,
-              hasLabor: false,
-              goodsCount: 0,
-              missNextTurn: false,
-              combo: { type: 'none', count: 0 },
-              stats: {
-                goodsProduced: 0,
-                goodsSold: 0,
-                combosHit: 0,
-                casinoNet: 0,
-                jackpotsWon: 0,
-              },
+                id: i + 1,
+                name: playerConfigs[i].name,
+                chips: 50,
+                position: 0,
+                color: PLAYER_COLORS[i],
+                icon: playerConfigs[i].icon,
+                hasRawMaterials: false,
+                hasLabor: false,
+                goodsCount: 0,
+                missNextTurn: false,
+                combo: { type: 'none', count: 0 },
+                stats: {
+                    goodsProduced: 0,
+                    goodsSold: 0,
+                    combosHit: 0,
+                    casinoNet: 0,
+                    casinoWins: 0,
+                    casinoLosses: 0,
+                    casinoTotalWagered: 0,
+                },
             });
-          }
-    
-          setPlayers(initialPlayers);
-          setCurrentPlayerIndex(0);
-          setGamePhase(GamePhase.ROLLING);
-          setRound(1);
-          setCrisisLevel(0);
-          setJackpot(20);
-          setLog(['Trò chơi bắt đầu!']);
-          setTradeLog([]);
-          setShowRulesModal(false);
-          if (startWithTutorial) {
+        }
+        
+        setPlayers(initialPlayers);
+        setCurrentPlayerIndex(0);
+        setGamePhase(GamePhase.ROLLING);
+        setRound(1);
+        setCrisisLevel(0);
+        setLog(['Trò chơi bắt đầu!']);
+        setShowRulesModal(false);
+        setThoiCuocDeck(shuffleDeck(THOI_CUOC_CARDS));
+        setVanMenhDeck(shuffleDeck(VAN_MENH_CARDS));
+        if (startWithTutorial) {
             setTutorialStep(0);
-          }
-        },
-        [],
-      );
+        }
+    }, []);
 
     const handleResetToSetup = () => {
         setPlayers([]);
@@ -119,8 +136,7 @@ const Monopoly: React.FC = () => {
     };
     
     const handleSquareAction = useCallback((player: Player, squareIndex: number) => {
-        const square = BOARD_SQUARES[squareIndex];
-        setActiveSquare(square);
+        const square = board[squareIndex];
         addLog(`${player.name} đã đến ô "${square.name}".`);
         
         const COMBO_THRESHOLD = 2;
@@ -134,17 +150,24 @@ const Monopoly: React.FC = () => {
                     const playersCopy = [...prevPlayers];
                     const p = { ...playersCopy[pIndex], stats: { ...playersCopy[pIndex].stats } };
                     
-                    if ([1, 8, 13, 18, 23, 27, 32, 37].includes(square.id)) {
-                        p.chips = Math.max(0, p.chips - 10);
-                        p.hasRawMaterials = true;
-                        addLog(`${p.name} trả 10 chip mua nguyên liệu.`);
-                    } else if ([2, 9, 14, 19, 24, 28, 33, 39].includes(square.id)) {
-                        p.chips = Math.max(0, p.chips - 5);
-                        p.hasLabor = true;
-                        addLog(`${p.name} trả 5 chip thuê công nhân.`);
-                    } else if (square.id === 6) {
-                        p.chips = Math.max(0, p.chips - 10);
-                        addLog(`${p.name} trả 10 chip chi phí sản xuất.`);
+                    if (square.description.includes('Nguyên liệu')) {
+                        const cost = 10;
+                        if (p.chips >= cost) {
+                            p.chips -= cost;
+                            p.hasRawMaterials = true;
+                            addLog(`${p.name} trả ${cost} chip mua nguyên liệu.`);
+                        } else {
+                            addLog(`${p.name} không đủ chip mua nguyên liệu.`);
+                        }
+                    } else if (square.description.includes('Lao động')) {
+                        const cost = 5;
+                        if (p.chips >= cost) {
+                            p.chips -= cost;
+                            p.hasLabor = true;
+                            addLog(`${p.name} trả ${cost} chip thuê công nhân.`);
+                        } else {
+                            addLog(`${p.name} không đủ chip thuê công nhân.`);
+                        }
                     }
                     
                     let actionTaken = false;
@@ -190,9 +213,6 @@ const Monopoly: React.FC = () => {
                     
                     if (p.goodsCount > 0) {
                         let profit = 20;
-                        if (square.id === 11) profit = 25;
-                        if (square.id === 17) profit = 30;
-                        if (square.id === 25) profit = 15;
                         
                         p.chips += profit;
                         p.goodsCount -= 1;
@@ -252,39 +272,41 @@ const Monopoly: React.FC = () => {
                     }
                     return p;
                 }));
-                const randomEvent = EVENT_CARDS[Math.floor(Math.random() * EVENT_CARDS.length)];
-                setCurrentEvent(randomEvent);
-                setShowEventModal(true);
+                if (square.subType === 'thoi_cuoc') {
+                    const deckCopy = [...thoiCuocDeck];
+                    const drawnCard = deckCopy.shift()!; // Take the top card
+                    deckCopy.push(drawnCard); // Put it at the bottom
+                    setCurrentEvent(drawnCard);
+                    setThoiCuocDeck(deckCopy);
+                    addLog(`${player.name} rút thẻ Thời Cuộc.`);
+                } else { // van_menh
+                    const deckCopy = [...vanMenhDeck];
+                    const drawnCard = deckCopy.shift()!; // Take the top card
+                    deckCopy.push(drawnCard); // Put it at the bottom
+                    setCurrentEvent(drawnCard);
+                    setVanMenhDeck(deckCopy);
+                    addLog(`${player.name} rút thẻ Vận Mệnh.`);
+                }
+                setShowEventDrawModal(true);
                 break;
 
             case SquareType.CORNER:
                  switch (square.id) {
-                    case 10: 
-                        addLog(`${player.name} rơi vào khủng hoảng, mất 15 chip!`);
-                        setPlayers(prev => prev.map(p => {
-                           if (p.id === player.id) {
-                               const comboReset = p.combo.count > 0 ? { combo: { type: 'none' as const, count: 0 } } : {};
-                               if(p.combo.count > 0) addLog(`${p.name} đã mất chuỗi combo.`);
-                               return { ...p, chips: Math.max(0, p.chips - 15), ...comboReset };
-                           }
-                           return p;
-                        }));
-                        break;
-                    case 20: 
+                    case 7: // Cách Mạng Công Nhân (was 21)
                         addLog("Cách mạng công nhân nổ ra!");
                         setPlayers(prev => {
-                            const wealthy = prev.filter(p => p.chips > 70);
-                            const poor = prev.filter(p => p.chips < 40);
-                            if (wealthy.length > 0 && poor.length > 0) {
-                                let totalToDistribute = wealthy.length * 10;
-                                addLog(`Tư sản chia ${totalToDistribute} chip.`);
-                                const share = Math.floor(totalToDistribute / poor.length);
+                            if (prev.length < 2) return prev;
+                            const richest = prev.reduce((max, p) => p.chips > max.chips ? p : max, prev[0]);
+                            const poorest = prev.reduce((min, p) => p.chips < min.chips ? p : min, prev[0]);
+
+                            if (richest.id !== poorest.id) {
+                                addLog(`${richest.name} chia 10 chip cho ${poorest.name}.`);
                                 return prev.map(p => {
                                     const comboReset = (p.id === player.id && p.combo.count > 0) ? { combo: { type: 'none' as const, count: 0 } } : {};
                                     if(p.id === player.id && p.combo.count > 0) addLog(`${p.name} đã mất chuỗi combo.`);
 
-                                    if (p.chips > 70) return {...p, chips: p.chips - 10, ...comboReset};
-                                    if (p.chips < 40) return {...p, chips: p.chips + share, ...comboReset};
+                                    if (p.id === richest.id) return {...p, chips: p.chips - 10, ...comboReset};
+                                    if (p.id === poorest.id) return {...p, chips: p.chips + 10, ...comboReset};
                                     return {...p, ...comboReset};
                                 });
                             }
@@ -297,28 +319,28 @@ const Monopoly: React.FC = () => {
                             });
                         });
                         break;
-                    case 30:
-                        addLog("Nhà nước điều tiết!");
+                    case 21: // Khủng Hoảng Kinh Tế (was 7)
+                        addLog(`${player.name} rơi vào khủng hoảng, mất 20 chip!`);
+                        setPlayers(prev => prev.map(p => {
+                           if (p.id === player.id) {
+                               const comboReset = p.combo.count > 0 ? { combo: { type: 'none' as const, count: 0 } } : {};
+                               if(p.combo.count > 0) addLog(`${p.name} đã mất chuỗi combo.`);
+                               return { ...p, chips: Math.max(0, p.chips - 20), ...comboReset };
+                           }
+                           return p;
+                        }));
+                        break;
+                    case 14: // Nhà Nước Can Thiệp
+                        addLog("Nhà nước can thiệp!");
                         setPlayers(prev => {
+                            if (prev.length < 2) return prev;
                             const richest = prev.reduce((max, p) => p.chips > max.chips ? p : max, prev[0]);
-                            if (richest.chips > 80 && prev.length > 1) {
-                                const poorest = prev.reduce((min, p) => p.chips < min.chips ? p : min, prev[0]);
-                                addLog(`${richest.name} trợ cấp ${poorest.name} 10 chip.`);
-                                return prev.map(p => {
-                                    const comboReset = (p.id === player.id && p.combo.count > 0) ? { combo: { type: 'none' as const, count: 0 } } : {};
-                                    if(p.id === player.id && p.combo.count > 0) addLog(`${p.name} đã mất chuỗi combo.`);
-
-                                    if (p.id === richest.id) return { ...p, chips: p.chips - 10, ...comboReset };
-                                    if (p.id === poorest.id) return { ...p, chips: p.chips + 10, ...comboReset };
-                                    return {...p, ...comboReset};
-                                });
-                            }
-                             return prev.map(p => {
-                                if (p.id === player.id && p.combo.count > 0) {
-                                    addLog(`${p.name} đã mất chuỗi combo.`);
-                                    return { ...p, combo: { type: 'none' as const, count: 0 }};
-                                }
-                                return p;
+                            addLog(`${richest.name}, người giàu nhất, phải trả 10 chip cho Ngân hàng.`);
+                            return prev.map(p => {
+                                const comboReset = (p.id === player.id && p.combo.count > 0) ? { combo: { type: 'none' as const, count: 0 } } : {};
+                                if(p.id === player.id && p.combo.count > 0) addLog(`${p.name} đã mất chuỗi combo.`);
+                                if (p.id === richest.id) return { ...p, chips: p.chips - 10, ...comboReset };
+                                return {...p, ...comboReset};
                             });
                         });
                         break;
@@ -334,7 +356,7 @@ const Monopoly: React.FC = () => {
                 setGamePhase(GamePhase.END_TURN);
                 break;
         }
-    }, [addLog, crisisLevel]);
+    }, [addLog, crisisLevel, board, thoiCuocDeck, vanMenhDeck]);
 
     const handleNextTutorialStep = () => {
         if (tutorialStep === null) return;
@@ -376,26 +398,39 @@ const Monopoly: React.FC = () => {
             setDice([d1, d2]);
             setIsDiceRolling(false);
             
-            const total = d1 + d2;
-            addLog(`${currentPlayer.name} tung được ${total}.`);
+            setPlayers(prevPlayers => {
+                const playerIndex = prevPlayers.findIndex(p => p.id === currentPlayer.id);
+                if (playerIndex === -1) return prevPlayers;
+                
+                const playerToMove = prevPlayers[playerIndex];
+                const total = d1 + d2;
+                addLog(`${playerToMove.name} tung được ${total}.`);
 
-            const newPosition = (currentPlayer.position + total) % BOARD_SQUARES.length;
-            if (newPosition < currentPlayer.position) {
-                addLog(`${currentPlayer.name} qua vạch đích, nhận 20 chip!`);
-                updatePlayerState(currentPlayer.id, { position: newPosition, chips: currentPlayer.chips + 20 });
-            } else {
-                updatePlayerState(currentPlayer.id, { position: newPosition });
-            }
+                const oldPosition = playerToMove.position;
+                const newPosition = (oldPosition + total) % board.length;
+                
+                let chipsUpdate = 0;
+                if (newPosition < oldPosition) {
+                    addLog(`${playerToMove.name} qua vạch đích, nhận 10 chip!`);
+                    chipsUpdate = 10;
+                }
 
-            setGamePhase(GamePhase.ACTION);
-            
-            setTimeout(() => {
-                setPlayers(currentPlayers => {
-                    const playerForAction = currentPlayers[currentPlayerIndex];
-                    handleSquareAction(playerForAction, newPosition);
-                    return currentPlayers;
-                });
-            }, 1000);
+                const updatedPlayer = {
+                    ...playerToMove,
+                    position: newPosition,
+                    chips: playerToMove.chips + chipsUpdate
+                };
+
+                const newPlayers = [...prevPlayers];
+                newPlayers[playerIndex] = updatedPlayer;
+
+                const nextSquare = board[newPosition];
+                setActiveSquare(nextSquare);
+                setShowSquareInfoModal(true);
+                setGamePhase(GamePhase.ACTION);
+                
+                return newPlayers;
+            });
         }, 1000);
     };
     
@@ -438,21 +473,11 @@ const Monopoly: React.FC = () => {
         }
 
         const player = players[currentPlayerIndex];
-        const { betCost, winnings, jackpotWon } = result;
+        const { betCost, winnings } = result;
         const netChipChange = winnings - betCost;
-        let newJackpot = jackpot;
 
-        if (jackpotWon) {
-            addLog(`🎉🎉🎉 ${player.name} TRÚNG JACKPOT ${jackpot} chip! 🎉🎉🎉`);
-            newJackpot = 20; // Reset
-        } else if (winnings === 0) { // Loss
-            let jackpotContribution = 0;
-            if (betCost === 5) jackpotContribution = 2;
-            else if (betCost === 10) jackpotContribution = 5;
-            else if (betCost === 15) jackpotContribution = 10;
-            
-            newJackpot += jackpotContribution;
-            addLog(`${player.name} thua ${betCost} chip tại Casino. ${jackpotContribution} chip đã được thêm vào Jackpot.`);
+        if (winnings === 0) { // Loss
+            addLog(`${player.name} thua ${betCost} chip tại Casino.`);
         } else { // Normal win
              addLog(`${player.name} thắng ${netChipChange} chip tại Casino!`);
         }
@@ -467,9 +492,11 @@ const Monopoly: React.FC = () => {
                 updatedPlayer.chips += netChipChange;
                 updatedPlayer.stats.casinoNet += netChipChange;
 
-                if (jackpotWon) {
-                    updatedPlayer.chips += jackpot;
-                    updatedPlayer.stats.jackpotsWon += 1;
+                updatedPlayer.stats.casinoTotalWagered += betCost;
+                if (winnings > 0) {
+                    updatedPlayer.stats.casinoWins += 1;
+                } else {
+                    updatedPlayer.stats.casinoLosses += 1;
                 }
                 
                 updatedPlayer.chips = Math.max(0, updatedPlayer.chips);
@@ -478,12 +505,11 @@ const Monopoly: React.FC = () => {
             return p;
         }));
 
-        setJackpot(newJackpot);
         setShowCasinoModal(false);
         setGamePhase(GamePhase.END_TURN);
     }
     
-    const handleEventResolve = () => {
+    const handleDrawnEventResolve = () => {
         const player = players[currentPlayerIndex];
         if (!currentEvent) return;
          let logMessage = `Sự kiện: ${currentEvent.title}`;
@@ -519,9 +545,20 @@ const Monopoly: React.FC = () => {
                 break;
         }
         addLog(logMessage);
-        setShowEventModal(false);
+        setShowEventDrawModal(false);
         setGamePhase(GamePhase.END_TURN);
     }
+
+    const handleCloseSquareInfoModal = () => {
+        setShowSquareInfoModal(false);
+        const currentPlayer = players[currentPlayerIndex];
+        if (activeSquare) {
+            handleSquareAction(currentPlayer, activeSquare.id);
+        } else {
+            // Failsafe, shouldn't happen
+            setGamePhase(GamePhase.END_TURN);
+        }
+    };
 
     // --- Trade Handlers ---
     const handleInitiateTrade = (partnerId: number) => {
@@ -535,14 +572,15 @@ const Monopoly: React.FC = () => {
             request: { chips: 0, hasRawMaterials: false, hasLabor: false },
         });
         setShowTradeModal(true);
+        // Fix: Use TRADING GamePhase
         setGamePhase(GamePhase.TRADING);
-        addTradeLog(`➡️ ${currentPlayer.name} mời ${partner.name} giao dịch.`);
+        addLog(`🤝 ${currentPlayer.name} mời ${partner.name} giao dịch.`);
     };
     const handleCancelTrade = () => {
         if(tradeOffer) {
             const proposer = players.find(p => p.id === tradeOffer.fromPlayerId);
             const partner = players.find(p => p.id === tradeOffer.toPlayerId);
-            addTradeLog(`🚫 Giao dịch giữa ${proposer?.name} & ${partner?.name} đã bị hủy.`);
+            addLog(`🚫 Giao dịch giữa ${proposer?.name} & ${partner?.name} đã bị hủy.`);
         }
         setShowTradeModal(false);
         setTradeOffer(null);
@@ -555,6 +593,9 @@ const Monopoly: React.FC = () => {
     const handleAcceptTrade = () => {
         if (!tradeOffer) return;
         const { fromPlayerId, toPlayerId, offer, request } = tradeOffer;
+        
+        const proposer = players.find(p => p.id === fromPlayerId);
+        const partner = players.find(p => p.id === toPlayerId);
     
         setPlayers(prev => {
             const playersCopy = [...prev];
@@ -589,7 +630,7 @@ const Monopoly: React.FC = () => {
             return playersCopy;
         });
     
-        addTradeLog(`✅ Giao dịch thành công!`);
+        addLog(`✅ Giao dịch thành công giữa ${proposer?.name} & ${partner?.name}!`);
         setShowTradeModal(false);
         setTradeOffer(null);
         setGamePhase(GamePhase.ROLLING);
@@ -598,7 +639,7 @@ const Monopoly: React.FC = () => {
         if (!tradeOffer) return;
         const proposer = players.find(p => p.id === tradeOffer.fromPlayerId);
         const partner = players.find(p => p.id === tradeOffer.toPlayerId);
-        addTradeLog(`❌ ${partner?.name} từối ${proposer?.name}.`);
+        addLog(`❌ ${partner?.name} từ chối giao dịch của ${proposer?.name}.`);
         setShowTradeModal(false);
         setTradeOffer(null);
         setGamePhase(GamePhase.ROLLING);
@@ -613,7 +654,7 @@ const Monopoly: React.FC = () => {
     }
 
     return (
-        <div className="w-full h-full p-4 grid grid-cols-[350px_1fr_350px] gap-4 items-start">
+        <div id="app-container" className="w-screen h-screen p-4 lg:grid lg:grid-cols-[350px_1fr_350px] gap-4 items-start">
             <PlayerInfo 
                 players={players} 
                 currentPlayerIndex={currentPlayerIndex} 
@@ -624,9 +665,11 @@ const Monopoly: React.FC = () => {
             <main className="w-full h-full flex items-center justify-center">
                  {viewMode === 'board' ? (
                     <GameBoard
+                        board={board}
                         players={players}
                         productionFeedback={productionFeedback}
                         currentPlayerId={players[currentPlayerIndex].id}
+                        layout={boardLayout}
                     />
                  ) : (
                     <PlayerStatusView players={players} />
@@ -636,9 +679,7 @@ const Monopoly: React.FC = () => {
             <RightPanel 
                 round={round}
                 crisisLevel={crisisLevel}
-                jackpot={jackpot}
                 log={log}
-                tradeLog={tradeLog}
                 dice={dice}
                 isDiceRolling={isDiceRolling}
                 onRollDice={handleRollDice}
@@ -648,20 +689,24 @@ const Monopoly: React.FC = () => {
                 onShowRules={() => setShowRulesModal(true)}
                 viewMode={viewMode}
                 onToggleView={handleToggleView}
+                onShowCustomizer={() => setShowBoardCustomizer(true)}
             />
             
+            {showSquareInfoModal && activeSquare && (
+                <SquareInfoModal square={activeSquare} onClose={handleCloseSquareInfoModal} />
+            )}
             {showCasinoModal && activeSquare && (
                 <CasinoModal 
                     square={activeSquare}
                     player={players[currentPlayerIndex]}
-                    jackpot={jackpot}
                     onClose={handleCasinoResolve}
                 />
             )}
-             {showEventModal && currentEvent && (
-                <EventCardModal
+             {showEventDrawModal && currentEvent && activeSquare?.subType && (
+                <EventDrawModal
                     event={currentEvent}
-                    onClose={handleEventResolve}
+                    squareSubType={activeSquare.subType}
+                    onClose={handleDrawnEventResolve}
                 />
             )}
             {gamePhase === GamePhase.GAME_OVER && (
@@ -669,6 +714,18 @@ const Monopoly: React.FC = () => {
             )}
              {showRulesModal && (
                 <RulesModal onClose={() => setShowRulesModal(false)} />
+            )}
+            {showBoardCustomizer && (
+                <BoardCustomizer 
+                    board={board}
+                    layout={boardLayout}
+                    onSave={(newBoard, newLayout) => {
+                        setBoard(newBoard);
+                        setBoardLayout(newLayout);
+                        setShowBoardCustomizer(false);
+                    }}
+                    onClose={() => setShowBoardCustomizer(false)}
+                />
             )}
             {showTradeModal && tradeOffer && (
                 <TradeModal 
@@ -692,4 +749,4 @@ const Monopoly: React.FC = () => {
     );
 };
 
-export default Monopoly;
+export default App;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Player } from '../../types/type';
-import PawnIcon from '../monopoly/PawnIcon';
+import PawnIcon from './PawnIcon';
 
 interface GameOverModalProps {
     players: Player[];
@@ -22,11 +22,11 @@ const GameOverModal: React.FC<GameOverModalProps> = ({ players, onPlayAgain }) =
 
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="pixel-panel p-6 text-center w-full max-w-2xl mx-4 flex flex-col">
+            <div className="pixel-panel p-6 text-center w-full max-w-2xl mx-4 flex flex-col animate-scale-in">
                 <h2 className="text-3xl font-pixel text-black mb-2">WINNER'S DASHBOARD</h2>
                 
-                <div className="pixel-panel-inset bg-yellow-100 p-4 my-4 border-4 border-yellow-400">
-                    <p className="font-pixel text-lg text-yellow-700">TƯ BẢN CHIẾN THẮNG</p>
+                <div className="pixel-panel-inset p-4 my-4 border-4 border-yellow-400" style={{ background: 'radial-gradient(circle, rgba(253,244,204,1) 0%, rgba(251,211,141,1) 100%)'}}>
+                    <p className="font-pixel text-lg text-yellow-700">ĐỘI CHIẾN THẮNG</p>
                     <div className="flex items-center justify-center gap-4 my-2">
                         <div className="w-20 h-20 text-6xl">
                            <PawnIcon color={winner.color} icon={winner.icon} className="w-full h-full" style={{ filter: 'drop-shadow(3px 3px 0px #1f2937)' }} />
@@ -52,17 +52,14 @@ const GameOverModal: React.FC<GameOverModalProps> = ({ players, onPlayAgain }) =
                                 </span>
                                 <span className="font-pixel text-lg text-black">${player.chips}</span>
                             </div>
-                            <div className="grid grid-cols-5 gap-1 mt-2 pixel-panel-inset bg-gray-200 p-1">
-                                <StatItem icon="🏭" value={player.stats.goodsProduced} label="Sản xuất" />
-                                <StatItem icon="📦" value={player.stats.goodsSold} label="Đã bán" />
+                            <div className="grid grid-cols-2 gap-1 mt-2 pixel-panel-inset bg-gray-200 p-1">
+                                <StatItem icon="💹" value={player.stats.goodsSold} label="Đã bán" />
                                 <StatItem 
                                     icon="🎲" 
                                     value={player.stats.casinoNet > 0 ? `+${player.stats.casinoNet}` : player.stats.casinoNet} 
                                     label="Casino" 
                                     className={player.stats.casinoNet > 0 ? 'text-green-600' : (player.stats.casinoNet < 0 ? 'text-red-600' : '')} 
                                 />
-                                <StatItem icon="🔥" value={player.stats.combosHit} label="Combo" />
-                                <StatItem icon="🎉" value={player.stats.jackpotsWon} label="Jackpot" />
                             </div>
                         </div>
                     ))}

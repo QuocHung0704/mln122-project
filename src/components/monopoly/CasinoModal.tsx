@@ -1,167 +1,208 @@
-import React, { useEffect, useState } from 'react';
-import { Square, Player } from '../../types/type';
+import React, { useState, useEffect } from 'react';
+import { Square, Player, CasinoBetResult } from '../../types/type';
 
 interface CasinoModalProps {
     square: Square;
     player: Player;
     jackpot: number;
-    onClose: (result: { betCost: number; winnings: number; jackpotWon: boolean } | null) => void;
+    onClose: (result: CasinoBetResult | null) => void;
 }
 
-type BetType = 'safe' | 'standard' | 'risky';
-type BetChoice = 'even' | 'odd' | '1-2' | '3-4' | '5-6' | 1 | 2 | 3 | 4 | 5 | 6;
+const Dice: React.FC<{ value: number }> = ({ value }) => {
+    const positions: { [key: number]: string[] } = {
+        1: ['center'],
+        2: ['top-left', 'bottom-right'],
+        3: ['top-left', 'center', 'bottom-right'],
+        4: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
+        5: ['top-left', 'top-right', 'center', 'bottom-left', 'bottom-right'],
+        6: ['top-left', 'top-right', 'middle-left', 'middle-right', 'bottom-left', 'bottom-right'],
+    };
+    const pipPositions = positions[value] || [];
 
-const BET_CONFIG = {
-    safe: { cost: 5, payout: 10, choices: ['even', 'odd'] as BetChoice[], name: "Cược An Toàn" },
-    standard: { cost: 10, payout: 30, choices: ['1-2', '3-4', '5-6'] as BetChoice[], name: "Cược Tiêu Chuẩn" },
-    risky: { cost: 15, payout: 90, choices: [1, 2, 3, 4, 5, 6] as BetChoice[], name: "Cược Mạo Hiểm" },
+    return (
+        <div className="w-20 h-20 bg-white rounded-lg border-4 border-black p-1 relative shadow-lg">
+            {pipPositions.map(pos => {
+                let posClass = '';
+                if(pos === 'center') posClass = 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2';
+                if(pos === 'top-left') posClass = 'top-2 left-2';
+                if(pos === 'top-right') posClass = 'top-2 right-2';
+                if(pos === 'bottom-left') posClass = 'bottom-2 left-2';
+                if(pos === 'bottom-right') posClass = 'bottom-2 right-2';
+                if(pos === 'middle-left') posClass = 'top-1/2 left-2 -translate-y-1/2';
+                if(pos === 'middle-right') posClass = 'top-1/2 right-2 -translate-y-1/2';
+                return <div key={pos} className={`absolute w-3 h-3 bg-black rounded-full ${posClass}`}></div>
+            })}
+        </div>
+    );
 };
 
+
 const CasinoModal: React.FC<CasinoModalProps> = ({ square, player, jackpot, onClose }) => {
-    const [view, setView] = useState<'selection' | 'result'>('selection');
-    const [selectedBetType, setSelectedBetType] = useState<BetType | null>(null);
-    const [selectedBetChoice, setSelectedBetChoice] = useState<BetChoice | null>(null);
-    const [isRolling, setIsRolling] = useState(false);
+    const [view, setView] = useState<'selection' | 'rolling' | 'result'>('selection');
+    const [animatedDice, setAnimatedDice] = useState<[number, number]>([1, 1]);
+    const [dice, setDice] = useState<[number, number]>([1, 1]);
+    const [betResult, setBetResult] = useState<CasinoBetResult | null>(null);
+    const [resultMessage, setResultMessage] = useState<React.ReactNode>('');
+    const [animatedJackpot, setAnimatedJackpot] = useState(0);
+    const [isJackpotAnimationComplete, setIsJackpotAnimationComplete] = useState(false);
     
-    // Result state
-    const [diceValue, setDiceValue] = useState<number>(0);
-    const [winnings, setWinnings] = useState(0);
-    const [jackpotWon, setJackpotWon] = useState(false);
-    const [resultMessage, setResultMessage] = useState('');
+    const betOptions = square.betOptions || [5, 10, 15, 20];
+    const multipliers = square.multipliers || { win: 2, bigWin: 3, jackpot: 5 };
+    const jackpotRoll = square.multipliers?.jackpotRoll || [6, 6];
 
     useEffect(() => {
-        const minBet = BET_CONFIG.safe.cost;
-        if (player.chips < minBet) {
-            onClose(null);
-        }
-    }, [player.chips, onClose]);
+        setIsJackpotAnimationComplete(false);
+        const animationDuration = 700;
+        const frameDuration = 1000 / 60; // 60fps
+        const totalFrames = Math.round(animationDuration / frameDuration);
+        let frame = 0;
 
-    const canAfford = (type: BetType) => player.chips >= BET_CONFIG[type].cost;
+        const easeOutQuad = (t: number) => t * (2 - t);
 
-    const handleSelectBetType = (type: BetType) => {
-        if (!canAfford(type)) return;
-        setSelectedBetType(type);
-        setSelectedBetChoice(null); // Reset choice when type changes
-    };
-    
-    const handleRoll = () => {
-        if (!selectedBetType || selectedBetChoice === null) return;
-        setIsRolling(true);
+        const counter = setInterval(() => {
+            frame++;
+            const progress = easeOutQuad(frame / totalFrames);
+            const currentValue = Math.round(jackpot * progress);
+            setAnimatedJackpot(currentValue);
 
-        const config = BET_CONFIG[selectedBetType];
-        const roll = Math.floor(Math.random() * 6) + 1;
+            if (frame === totalFrames) {
+                clearInterval(counter);
+                setAnimatedJackpot(jackpot); // Ensure it ends on the exact value
+                setIsJackpotAnimationComplete(true);
+            }
+        }, frameDuration);
+
+        return () => clearInterval(counter);
+    }, [jackpot]);
+
+
+    const handleBet = (betCost: number) => {
+        if (player.chips < betCost) return;
+        setView('rolling');
+
+        const rollInterval = setInterval(() => {
+            setAnimatedDice([
+                Math.floor(Math.random() * 6) + 1,
+                Math.floor(Math.random() * 6) + 1,
+            ]);
+        }, 80);
 
         setTimeout(() => {
-            let isWin = false;
-            switch (selectedBetType) {
-                case 'safe':
-                    isWin = (selectedBetChoice === 'even' && roll % 2 === 0) || (selectedBetChoice === 'odd' && roll % 2 !== 0);
-                    break;
-                case 'standard':
-                    const range = (selectedBetChoice as string).split('-').map(Number);
-                    isWin = roll >= range[0] && roll <= range[1];
-                    break;
-                case 'risky':
-                    isWin = roll === selectedBetChoice;
-                    break;
-            }
+            clearInterval(rollInterval);
+            const d1 = Math.floor(Math.random() * 6) + 1;
+            const d2 = Math.floor(Math.random() * 6) + 1;
+            setDice([d1, d2]);
 
-            const currentWinnings = isWin ? config.payout : 0;
-            const isJackpotWin = isWin && selectedBetType === 'risky';
+            const total = d1 + d2;
+            const jackpotWon = (d1 === jackpotRoll[0] && d2 === jackpotRoll[1]) || (d1 === jackpotRoll[1] && d2 === jackpotRoll[0]);
 
-            setDiceValue(roll);
-            setWinnings(currentWinnings);
-            setJackpotWon(isJackpotWin);
-            
-            if (isJackpotWin) {
-                setResultMessage(`TRÚNG SỐ ĐỘC ĐẮC! +${currentWinnings - config.cost} & JACKPOT!`);
-            } else if (isWin) {
-                setResultMessage(`Thắng! +${currentWinnings - config.cost} chip`);
+            let winnings = 0;
+            if (jackpotWon) {
+                winnings = betCost * multipliers.jackpot; 
+                setResultMessage(
+                     <div className="animate-text-glow">
+                        <p className="text-3xl">🎉 JACKPOT! 🎉</p>
+                        <p className="text-lg mt-2">Thắng {winnings} chip & hũ {jackpot} chip!</p>
+                    </div>
+                );
+            } else if (total >= 10) {
+                winnings = betCost * multipliers.bigWin;
+                setResultMessage(`THẮNG LỚN! +${winnings - betCost} chip`);
+            } else if (total >= 7) {
+                winnings = betCost * multipliers.win;
+                setResultMessage(`Thắng! +${winnings - betCost} chip`);
             } else {
-                setResultMessage(`Thua! -${config.cost} chip`);
+                winnings = 0;
+                setResultMessage(`Thua! -${betCost} chip`);
             }
 
-            setIsRolling(false);
+            const result: CasinoBetResult = { betCost, winnings, jackpotWon };
+            setBetResult(result);
             setView('result');
-        }, 1000);
+        }, 1500);
     };
 
     const handleClose = () => {
-        if (!selectedBetType) {
-            onClose(null); // Should not happen with the new UI flow, but for safety
-            return;
-        };
-        const config = BET_CONFIG[selectedBetType];
-        onClose({
-            betCost: config.cost,
-            winnings: winnings,
-            jackpotWon: jackpotWon,
-        });
+        onClose(betResult);
     };
+
+    const handleSkip = () => {
+        onClose(null);
+    }
     
     const renderSelectionView = () => (
          <>
-            <p className="font-pixel text-xs text-gray-800 mb-4">CHỌN MỘT MỨC CƯỢC</p>
-            <div className="grid grid-cols-1 gap-3 mb-4">
-                {(Object.keys(BET_CONFIG) as BetType[]).map(type => {
-                    const config = BET_CONFIG[type];
-                    const affordable = canAfford(type);
+            <p className="font-pixel text-lg">Hũ Jackpot Hiện tại: 
+                <span 
+                    className={`inline-block text-yellow-500 text-2xl ${isJackpotAnimationComplete ? 'animate-jackpot-glow' : ''}`}
+                    style={{textShadow: '2px 2px 0 #000'}}
+                >
+                    ${animatedJackpot}
+                </span>
+            </p>
+            <p className="text-sm my-4">Chọn mức cược và tung xúc xắc. Tung được {jackpotRoll[0]} và {jackpotRoll[1]} để trúng Jackpot!</p>
+            <div className="grid grid-cols-2 gap-4 my-6">
+                {betOptions.map(bet => {
+                    const canAfford = player.chips >= bet;
                     return (
-                        <div key={type} className={`p-3 pixel-button text-left transition-all ${selectedBetType === type ? 'bg-cyan-200' : 'bg-gray-200'} ${!affordable ? 'opacity-50 cursor-not-allowed' : ''}`} onClick={() => handleSelectBetType(type)}>
-                             <h4 className="font-bold font-pixel">{config.name} (Cược {config.cost})</h4>
-                             <p className="text-xs">Thắng nhận {config.payout}. {type === 'risky' && `Cơ hội trúng JACKPOT $${jackpot}!`}</p>
-                        </div>
-                    );
+                        <button key={bet} onClick={() => handleBet(bet)} disabled={!canAfford || view !== 'selection'} className="w-full pixel-button-color bg-red-500 text-white font-pixel py-3 disabled:bg-gray-500">
+                            Cược {bet}
+                        </button>
+                    )
                 })}
             </div>
-            
-            {selectedBetType && (
-                <div className="my-4">
-                    <p className="font-pixel text-xs text-gray-800 mb-2">ĐẶT CƯỢC VÀO</p>
-                    <div className="grid grid-cols-3 gap-2">
-                         {BET_CONFIG[selectedBetType].choices.map(choice => (
-                             <button key={String(choice)} onClick={() => setSelectedBetChoice(choice)} className={`p-2 font-pixel text-sm pixel-button ${selectedBetChoice === choice ? 'bg-yellow-300' : 'bg-gray-300'}`}>
-                                 {String(choice).toUpperCase()}
-                             </button>
-                         ))}
-                    </div>
-                </div>
-            )}
-
-            <button onClick={handleRoll} disabled={!selectedBetChoice || isRolling} className="w-full pixel-button-color bg-red-500 text-white font-pixel py-3 disabled:bg-gray-500 mt-2">
-                {isRolling ? '...' : 'QUAY!'}
+             <button onClick={handleSkip} disabled={view !== 'selection'} className="w-full pixel-button mt-3 font-pixel py-2 text-sm">
+                Bỏ qua
             </button>
+        </>
+    );
+    
+     const renderRollingView = () => (
+        <>
+            <p className="text-xl font-pixel my-4 animate-pulse">Đang tung xúc xắc...</p>
+            <div className="flex justify-center gap-4">
+                <Dice value={animatedDice[0]} />
+                <Dice value={animatedDice[1]} />
+            </div>
         </>
     );
 
     const renderResultView = () => {
-         const config = BET_CONFIG[selectedBetType!];
-         const netChange = winnings - config.cost;
-         const finalMessageColor = jackpotWon ? 'text-yellow-500' : netChange > 0 ? 'text-green-600' : 'text-red-600';
+        const netChange = betResult ? betResult.winnings - betResult.betCost : 0;
+        const finalMessageColor = netChange > 0 ? 'text-green-600' : (betResult?.jackpotWon ? 'text-yellow-500' : 'text-red-600');
 
         return (
             <>
-                <p className="font-pixel text-gray-600">Kết quả:</p>
-                <p className="font-pixel text-7xl font-bold my-2">{diceValue}</p>
-                <p className={`text-lg font-pixel my-4 ${finalMessageColor}`}>
+                <div className="flex justify-center gap-4">
+                    <Dice value={dice[0]} />
+                    <Dice value={dice[1]} />
+                </div>
+                <div className={`text-xl font-pixel my-4 ${finalMessageColor}`}>
                     {resultMessage}
-                </p>
-                {jackpotWon && <p className="text-xl font-pixel text-green-500 animate-bounce">+ ${jackpot} TỪ JACKPOT!</p>}
+                </div>
                 <button onClick={handleClose} className="w-full pixel-button-color bg-green-500 text-white font-pixel py-3 mt-4">
                     TIẾP TỤC
                 </button>
             </>
         );
     }
+    
+    const renderContent = () => {
+        switch(view) {
+            case 'rolling': return renderRollingView();
+            case 'result': return renderResultView();
+            case 'selection':
+            default:
+                return renderSelectionView();
+        }
+    }
 
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="pixel-panel p-6 text-center w-full max-w-md mx-4">
-                <h2 className="text-2xl font-pixel text-red-600 mb-2">{square.name}</h2>
-                <p className="text-sm text-gray-700 mb-4">{square.description}</p>
-                
-                <div className="pixel-panel-inset p-4 min-h-[300px]">
-                    {view === 'selection' ? renderSelectionView() : renderResultView()}
+            <div className="pixel-panel p-6 text-center w-full max-w-md mx-4 animate-scale-in">
+                <h2 className="text-2xl font-pixel text-red-600 mb-2">{square.name} {square.icon}</h2>
+                <div className="pixel-panel-inset p-4 min-h-[250px] flex flex-col justify-center">
+                   {renderContent()}
                 </div>
             </div>
         </div>
