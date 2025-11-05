@@ -1,74 +1,80 @@
 import { EventCard, EffectType } from '../types/type';
 
-export const EVENT_CARDS: EventCard[] = [
+export const THOI_CUOC_CARDS: EventCard[] = [
   {
-    id: 'evt_001',
-    title: 'Chính Phủ Trợ Cấp',
-    description: 'Một khoản trợ cấp bất ngờ từ chính phủ giúp bạn mở rộng sản xuất.',
+    id: 'tc_001',
+    title: 'Công Nghệ Mới',
+    description: 'Bạn áp dụng công nghệ mới giúp tối ưu sản xuất. Nhận 10 chip.',
     effectType: EffectType.GAIN_CHIPS,
-    value: 15,
+    value: 10,
   },
   {
-    id: 'evt_002',
+    id: 'tc_002',
     title: 'Công Nhân Đình Công',
     description: 'Bất đồng về lương bổng khiến dây chuyền sản xuất của bạn phải tạm dừng.',
     effectType: EffectType.MISS_TURN,
     value: 1,
   },
   {
-    id: 'evt_003',
-    title: 'Kiểm Tra Thuế',
-    description: 'Cơ quan thuế phát hiện một vài sai sót trong sổ sách của bạn. Phải nộp phạt thôi.',
-    effectType: EffectType.LOSE_CHIPS,
-    value: 10,
-  },
-  {
-    id: 'evt_004',
-    title: 'Trúng Thầu Hợp Đồng Lớn',
-    description: 'Bạn đã vượt qua các đối thủ để giành được một hợp đồng béo bở. Lợi nhuận đang tuôn chảy!',
+    id: 'tc_003',
+    title: 'Hợp Đồng Lớn',
+    description: 'Bạn trúng một hợp đồng sản xuất lớn. Nhận ngay 20 chip để mở rộng quy mô.',
     effectType: EffectType.GAIN_CHIPS,
     value: 20,
   },
   {
-    id: 'evt_005',
-    title: 'Khủng Hoảng Chuỗi Cung Ứng',
-    description: 'Một mắt xích quan trọng trong chuỗi cung ứng bị đứt gãy. Bạn phải tốn chi phí để giải quyết.',
+    id: 'tc_004',
+    title: 'Đối Thủ Cạnh Tranh',
+    description: 'Đối thủ tung sản phẩm mới, bạn phải giảm giá để cạnh tranh. Mất 10 chip.',
+    effectType: EffectType.LOSE_CHIPS,
+    value: 10,
+  },
+  {
+    id: 'tc_005',
+    title: 'Nguồn Cung Gián Đoạn',
+    description: 'Nguồn cung nguyên liệu bị gián đoạn, chi phí tăng cao. Mất 15 chip.',
     effectType: EffectType.LOSE_CHIPS,
     value: 15,
   },
+];
+
+export const VAN_MENH_CARDS: EventCard[] = [
   {
-    id: 'evt_006',
+    id: 'vm_001',
+    title: 'Trúng Xổ Số',
+    description: 'Vận may bất ngờ mỉm cười. Nhận 15 chip.',
+    effectType: EffectType.GAIN_CHIPS,
+    value: 15,
+  },
+  {
+    id: 'vm_002',
+    title: 'Kiểm Tra Thuế',
+    description: 'Cơ quan thuế phát hiện sai sót. Nộp phạt 10 chip.',
+    effectType: EffectType.LOSE_CHIPS,
+    value: 10,
+  },
+  {
+    id: 'vm_003',
     title: 'Thị Trường Bùng Nổ',
-    description: 'Nhu cầu thị trường tăng đột biến. Tất cả các nhà tư bản đều hưởng lợi.',
+    description: 'Nhu cầu thị trường tăng đột biến. Tất cả các đội đều hưởng lợi!',
     effectType: EffectType.EVERYONE_GAINS,
     value: 10,
   },
   {
-    id: 'evt_007',
-    title: 'Luật Môi Trường Mới',
-    description: 'Quy định mới về bảo vệ môi trường có hiệu lực. Mọi người đều phải đầu tư để nâng cấp.',
+    id: 'vm_004',
+    title: 'Luật Mới',
+    description: 'Quy định mới có hiệu lực. Mọi người đều phải tốn chi phí để thích ứng.',
     effectType: EffectType.EVERYONE_LOSES,
     value: 5,
   },
   {
-    id: 'evt_008',
+    id: 'vm_005',
     title: 'Tái Cấu Trúc',
-    description: 'Bạn quyết định tái cấu trúc doanh nghiệp. Quay trở lại ô "Sản xuất Khởi nghiệp" để bắt đầu lại kế hoạch của mình.',
+    description: 'Bạn quyết định tái cấu trúc. Quay trở lại ô "Khởi Nghiệp" để bắt đầu lại kế hoạch.',
     effectType: EffectType.MOVE_TO,
     value: 0,
   },
-  {
-    id: 'evt_009',
-    title: 'Đổi Mới Sáng Tạo',
-    description: 'Một ý tưởng đột phá giúp bạn tối ưu hóa chi phí và tăng lợi nhuận.',
-    effectType: EffectType.GAIN_CHIPS,
-    value: 10,
-  },
-  {
-    id: 'evt_010',
-    title: 'Vụ Kiện Bằng Sáng Chế',
-    description: 'Bạn thắng một vụ kiện bản quyền quan trọng. Nhà tư bản giàu nhất phải bồi thường cho bạn.',
-    effectType: EffectType.PAY_PLAYER,
-    value: 15, // Richest player pays current player 15
-  },
 ];
+
+// Fix: Export combined event cards array.
+export const EVENT_CARDS = [...THOI_CUOC_CARDS, ...VAN_MENH_CARDS];

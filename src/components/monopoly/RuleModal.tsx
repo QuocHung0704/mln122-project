@@ -3,7 +3,7 @@ import React from 'react';
 const RulesModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="pixel-panel w-full max-w-2xl mx-4 flex flex-col">
+            <div className="pixel-panel w-full max-w-2xl mx-4 flex flex-col animate-scale-in">
                 <div className="flex justify-between items-center p-4 bg-yellow-400 border-b-4 border-black">
                     <h2 className="text-2xl font-pixel text-black">LUẬT CHƠI</h2>
                     <button onClick={onClose} className="w-10 h-10 pixel-button-color bg-red-500 flex items-center justify-center text-white">
@@ -12,62 +12,39 @@ const RulesModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                         </svg>
                     </button>
                 </div>
-                
-                <div className="p-6 text-gray-800 space-y-4 overflow-y-auto max-h-[70vh] pixel-panel-inset m-4">
-                    <section>
-                        <h3 className="text-lg font-pixel text-black mb-2">I. MỤC ĐÍCH</h3>
-                        <p className="text-sm">Trò chơi giúp người chơi hiểu các khái niệm Kinh tế chính trị Mác – Lênin qua hình thức giải trí tương tác, kết hợp may rủi và chiến lược.</p>
-                    </section>
-                    
-                    <section>
-                        <h3 className="text-lg font-pixel text-black mb-2">II. CÁCH CHƠI</h3>
-                        <div className="space-y-2 pl-4 text-sm">
-                            <div>
-                                <h4 className="font-bold">1. Khởi đầu</h4>
-                                <ul className="list-disc list-inside ml-2">
-                                    <li>Mỗi người chơi bắt đầu với 50 chip tại ô "Khởi nghiệp".</li>
-                                </ul>
-                            </div>
-                            <div>
-                                <h4 className="font-bold">2. Lượt chơi</h4>
-                                <ul className="list-disc list-inside ml-2">
-                                    <li>Tung 2 xúc xắc và di chuyển.</li>
-                                    <li>Vượt qua ô "Khởi nghiệp", nhận 20 chip.</li>
-                                    <li>Thực hiện hành động tại ô bạn dừng.</li>
-                                </ul>
-                            </div>
-                            <div>
-                                <h4 className="font-bold">3. Sản xuất & Bán hàng</h4>
-                                 <ul className="list-disc list-inside ml-2">
-                                    <li>Cần có cả "Nguyên liệu" và "Lao động" để sản xuất.</li>
-                                    <li>Khi đủ, chúng tự động chuyển thành 1 "Hàng hóa".</li>
-                                    <li>Đến ô "Thị Trường" để bán "Hàng hóa" lấy chip.</li>
-                                </ul>
-                            </div>
-                             <div>
-                                <h4 className="font-bold">4. Casino & Khủng hoảng</h4>
-                                <ul className="list-disc list-inside ml-2">
-                                    <li>Vào ô Casino sẽ chơi game may rủi.</li>
-                                    <li>Mỗi lần vào Casino, "Thanh Khủng hoảng" sẽ tăng lên.</li>
-                                    <li>Khi thanh này đầy, **"Đại Suy thoái"** xảy ra, tất cả mất 25% số chip!</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </section>
-                    
-                     <section>
-                        <h3 className="text-lg font-pixel text-black mb-2">III. KẾT THÚC</h3>
-                        <p className="text-sm">Trò chơi kết thúc sau 10 vòng. Người có nhiều chip nhất sẽ thắng.</p>
-                    </section>
-                </div>
+                <div className="p-6 overflow-y-auto max-h-[70vh] bg-white">
+                    <h3 className="font-bold text-lg mb-2">Mục Tiêu</h3>
+                    <p className="mb-4 text-sm">Trở thành người chơi có nhiều Chip nhất sau 10 vòng chơi.</p>
 
-                <div className="p-4 text-center">
-                     <button
-                        onClick={onClose}
-                        className="w-1/2 pixel-button-color bg-green-500 text-white font-pixel py-3 px-4 text-lg"
-                    >
-                        OK
-                    </button>
+                    <h3 className="font-bold text-lg mb-2">Cách Chơi</h3>
+                    <ul className="list-disc list-inside space-y-2 text-sm">
+                        <li>Vào lượt của mình, người chơi tung 2 viên xúc xắc và di chuyển quân cờ theo tổng số nút.</li>
+                        <li>Khi đi qua ô "Khởi Nghiệp", bạn nhận 10 chip tiền lương.</li>
+                        <li>Dừng lại ở một ô sẽ kích hoạt hành động tương ứng của ô đó.</li>
+                    </ul>
+
+                    <h3 className="font-bold text-lg mt-4 mb-2">Các Loại Ô</h3>
+                    <div className="space-y-3 text-sm">
+                        <p><strong>🏭 Sản Xuất:</strong> Trả chip để nhận thẻ Nguyên Liệu hoặc Lao Động. Khi có cả hai, chúng sẽ tự động kết hợp thành một Hàng Hóa.</p>
+                        <p><strong>💹 Thị Trường:</strong> Bán Hàng Hóa để nhận chip. Càng bán nhiều, combo càng lớn và thưởng càng cao.</p>
+                        <p><strong>🎲 Casino:</strong> Cược chip để thử vận may. Thắng có thể nhân đôi, nhân ba tiền cược, hoặc thậm chí trúng Jackpot! Tuy nhiên, mỗi lần chơi sẽ làm tăng mức độ Khủng Hoảng.</p>
+                        <p><strong>❓ Sự Kiện:</strong> Rút một thẻ sự kiện và thực hiện theo hướng dẫn.</p>
+                        <p><strong>⚡ Ô Góc:</strong> Các ô đặc biệt với hiệu ứng riêng, có thể tốt hoặc xấu.</p>
+                    </div>
+                    
+                    <h3 className="font-bold text-lg mt-4 mb-2">Khủng Hoảng & Jackpot</h3>
+                    <ul className="list-disc list-inside space-y-2 text-sm">
+                        <li>Mỗi khi một người chơi vào ô Casino (dù có cược hay không), thanh <span className="text-red-600 font-bold">Khủng Hoảng</span> sẽ tăng lên.</li>
+                        <li>Khi thanh Khủng Hoảng đạt 100%, một sự kiện <span className="text-red-600 font-bold">ĐẠI SUY THOÁI</span> sẽ xảy ra, tất cả người chơi mất 25% số chip hiện có.</li>
+                        <li>Mỗi khi người chơi thua cược tại Casino, một phần tiền cược sẽ được thêm vào hũ <span className="text-yellow-600 font-bold">Jackpot</span>.</li>
+                        <li>Để trúng Jackpot, người chơi phải tung được hai con 6 khi cược ở Casino.</li>
+                    </ul>
+                    
+                    <h3 className="font-bold text-lg mt-4 mb-2">Giao Dịch</h3>
+                    <ul className="list-disc list-inside space-y-2 text-sm">
+                        <li>Vào đầu lượt của mình (trước khi tung xúc xắc), bạn có thể mời người chơi khác giao dịch.</li>
+                        <li>Bạn có thể trao đổi Chip, thẻ Nguyên Liệu và Lao Động.</li>
+                    </ul>
                 </div>
             </div>
         </div>
