@@ -7,25 +7,25 @@ export const CHARACTERS: Character[] = [
     id: 'smith',
     name: 'Adam Smith',
     img: 'https://tse4.mm.bing.net/th/id/OIP.zdpVzbhGU1lkZA3TD8mzMgHaHa?pid=Api&P=0&h=180',
-    cardImg: '/public/assets/yellow card.png', // SỬA LẠI ĐƯỜNG DẪN
+    cardImg: './assets/yellow card.png', 
   },
   {
     id: 'engels',
     name: 'Friedrich Engels',
     img: 'https://tse3.mm.bing.net/th/id/OIP.vPp7yBzLDBwfR9IgjjTZxgHaJ4?pid=Api&P=0&h=180',
-    cardImg: './assets/green card.png', // SỬA LẠI ĐƯỜNG DẪN
+    cardImg: './assets/green card.png', 
   },
   {
     id: 'marx', 
     name: 'Karl Marx',
     img: 'https://tse2.mm.bing.net/th/id/OIP.EdQ2y8gyLuSugbb5tUOprwHaJY?pid=Api&P=0&h=180',
-    cardImg: './assets/red card.png', // SỬA LẠI ĐƯỜNG DẪN
+    cardImg: './assets/red card.png', 
   },
   {
     id: 'montchrestien',
     name: 'Antoine de Montchrestien',
     img: 'https://cdn.britannica.com/75/151775-050-BD03DDB7/portrait-prelate-French-Cardinal-Richelieu-statesman.jpg?w=300',
-    cardImg: './assets/blue card.png', // SỬA LẠI ĐƯỜNG DẪN
+    cardImg: './assets/blue card.png', 
   },
 ];
 
