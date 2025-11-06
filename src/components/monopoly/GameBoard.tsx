@@ -178,7 +178,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ players, productionFeedback, curr
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[72%] h-[72%] border-4 border-black bg-[#166534] rounded-full flex flex-col items-center justify-center p-4">
                     {/* XÓA SVG VÀ H1, THAY BẰNG IMG */}
                     <img 
-                        src="/public/assets/CCD-06.png" 
+                        src="../assets/CCD-06.png" 
                         alt="Logo Cờ Công Dân" 
                         className="max-w-[80%] max-h-[80%] object-contain" 
                     />
