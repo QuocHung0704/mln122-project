@@ -90,7 +90,8 @@ interface PlayerInfoProps {
 const PlayerInfo: React.FC<PlayerInfoProps> = ({ players, currentPlayerIndex, gamePhase, onInitiateTrade }) => {
     const canTrade = gamePhase === GamePhase.ROLLING;
     return (
-        <aside id="player-info-panel" className="h-full pixel-panel p-4 flex flex-col gap-4 overflow-y-auto">
+        // THAY ĐỔI: Thêm 'lg:h-full' thay vì 'h-full'
+        <aside id="player-info-panel" className="lg:h-full pixel-panel p-4 flex flex-col gap-4 overflow-y-auto">
             <h2 className="font-pixel text-2xl text-center">PLAYERS</h2>
              {players.map((player, index) => (
                 <PlayerCard 

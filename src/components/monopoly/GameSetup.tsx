@@ -42,10 +42,9 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
   };
 
   const handleCharacterChange = (index: number, characterId: string) => {
-    // SỬA Ở ĐÂY: Xóa logic kiểm tra nhân vật đã được chọn
-    // if (playerCharacters.includes(characterId) && playerCharacters[index] !== characterId) {
-    //   return;
-    // }
+    if (playerCharacters.includes(characterId) && playerCharacters[index] !== characterId) {
+      return;
+    }
 
     const newCharacters = [...playerCharacters];
     newCharacters[index] = newCharacters[index] === characterId ? '' : characterId;
@@ -80,16 +79,22 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
   );
 
   // ✅ return nằm ở thân chính của component
+  // THAY ĐỔI: Chỉnh sửa các lớp CSS của div gốc
+  // min-h-screen -> h-full (để vừa với layout cha)
+  // w-screen -> w-full (để vừa với layout cha)
+  // justify-center -> justify-start (để nội dung bắt đầu từ trên)
+  // Thêm overflow-y-auto (để tự cuộn khi nội dung quá dài)
   return (
-    <div className="h-full w-full p-4 flex flex-col items-center justify-center gap-8 overflow-auto">
+    <div className="h-full w-full p-4 flex flex-col items-center justify-start gap-8 overflow-y-auto">
       <h1
-        className="text-4xl md:text-5xl font-pixel text-black text-center leading-tight"
+        className="text-4xl md:text-5xl font-pixel text-black text-center leading-tight pt-4" // Thêm pt-4 để không bị dính sát lề
         style={{ textShadow: '4px 4px 0 #fff, 8px 8px 0 #000' }}
       >
         CỜ CÔNG DÂN
       </h1>
 
-      <main className="pixel-panel p-6 flex flex-col items-center gap-6 w-full max-w-2xl">
+      {/* Thêm flex-shrink-0 để panel chính không bị co lại khi màn hình hẹp */}
+      <main className="pixel-panel p-6 flex flex-col items-center gap-6 w-full max-w-2xl flex-shrink-0">
         <div>
           <h2 className="text-xl font-pixel text-center">CHỌN SỐ NGƯỜI CHƠI</h2>
           <div className="flex justify-center gap-4 mt-4">
@@ -100,7 +105,7 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
         </div>
 
         <div className="w-full space-y-4">
-          <h2 className="text-xl font-pixel text-center">TÙY CHỈNH NGƯỜC CHƠI</h2>
+          <h2 className="text-xl font-pixel text-center">TÙY CHỈNH NGƯỜI CHƠI</h2>
           {Array.from({ length: selectedPlayers }).map((_, index) => (
             <div
               key={index}
@@ -126,20 +131,18 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
                 <div className="w-full grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {CHARACTERS.map((char) => {
                     const isSelected = playerCharacters[index] === char.id;
-                    // SỬA Ở ĐÂY: Xóa biến isTaken
-                    // const isTaken = playerCharacters.includes(char.id) && !isSelected;
+                    const isTaken = playerCharacters.includes(char.id) && !isSelected;
 
                     return (
                       <button
                         key={char.id}
                         onClick={() => handleCharacterChange(index, char.id)}
-                        // disabled={isTaken} // SỬA Ở ĐÂY: Xóa prop disabled
+                        disabled={isTaken}
                         className={`p-1 rounded-md transition-all duration-150 ${
                           isSelected
                             ? 'border-4 border-yellow-400 transform scale-105 shadow-lg'
                             : 'border-4 border-transparent'
-                        } 
-                        hover:border-yellow-200`} // SỬA Ở ĐÂY: Xóa logic class của isTaken
+                        } ${isTaken ? 'opacity-40 cursor-not-allowed' : 'hover:border-yellow-200'}`}
                       >
                         <img
                           src={char.cardImg}
@@ -179,6 +182,9 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
           BẮT ĐẦU!
         </button>
       </main>
+      
+      {/* Thêm một khoảng đệm ở dưới để cuộn đẹp hơn */}
+      <div className="h-8 flex-shrink-0"></div>
     </div>
   );
 };

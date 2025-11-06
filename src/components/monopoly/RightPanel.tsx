@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import { Player, GamePhase } from '../../types/type';
 import GameLog from './GameLog';
@@ -109,7 +107,8 @@ interface RightPanelProps {
 
 const RightPanel: React.FC<RightPanelProps> = (props) => {
     return (
-         <aside id="right-panel" className="h-full pixel-panel p-4 flex flex-col gap-4">
+        // THAY ĐỔI: Thêm 'lg:h-full' thay vì 'h-full'
+         <aside id="right-panel" className="lg:h-full pixel-panel p-4 flex flex-col gap-4">
             <div className="flex items-center justify-between">
                 <h2 className="font-pixel text-2xl text-center font-bold">
                     Vòng {props.round}/10
