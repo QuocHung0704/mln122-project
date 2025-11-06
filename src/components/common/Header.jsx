@@ -16,7 +16,7 @@ const Header = ({ activeSection, setActiveSection }) => {
           <div className="flex-shrink-0 flex items-center">           
             {/* THAY ĐỔI Ở ĐÂY: Tăng kích cỡ logo lên h-20 w-20 */}
             <img 
-              src="/public/assets/CCD-06.png" 
+              src="../../../public/assets/CCD-06.png" 
               alt="Logo" 
               className="h-20 w-21 object-contain" 
             />

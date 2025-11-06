@@ -1,52 +1,183 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { DollarSign, CheckCircle, XCircle, ChevronRight, Lock } from 'lucide-react';
+import { DollarSign, CheckCircle, XCircle, ChevronRight, Lock, Heart, Spade, Diamond, Club, Clock, Check } from 'lucide-react';
 
-// Thanh hiển thị trạng thái người chơi
-const PlayerStatus = ({ players, lockedPlayers, currentPlayerId }) => (
-  <div className="flex flex-col sm:flex-row justify-center gap-4 mb-6">
-    {players.map((player) => {
-      const isLocked = lockedPlayers.has(player.id);
-      const isCurrent = player.id === currentPlayerId;
-      return (
-        <div
-          key={player.id}
-          className={`p-3 rounded-lg border-2 transition-all w-full sm:w-auto
-                     ${isCurrent && !isLocked
-                       ? 'bg-amber-100 border-amber-400 shadow-md'
-                       : 'bg-stone-50 border-stone-200'
-                     }
-                     ${player.chips <= 0 ? 'opacity-50' : ''}`}
-        >
-          <div className="flex items-center justify-between">
-            <span className="font-bold text-stone-800">{player.name}</span>
-            {isLocked && <Lock className="h-4 w-4 text-green-600" title="Đã chốt" />}
-            {player.chips <= 0 && <span className="text-xs text-red-600 font-bold">HẾT TIỀN</span>}
-          </div>
-          <div className="font-semibold text-green-700">${player.chips}</div>
+// --- Component 1: Bảng điều khiển (Theme Sáng, Bỏ viền màu) ---
+const PlayerQuadrant = ({ player, input, onBetChange, onAnswerSelect, onLockIn, minBet, maxBet, isDisabled }) => {
+  const { bet, answerIndex, isLocked } = input;
+  const isEliminated = player.chips <= 0;
+
+  // Icons vẫn giữ màu để phân biệt
+  const playerIcons = [
+    <Heart className="h-6 w-6" style={{ color: player.color }} />,
+    <Spade className="h-6 w-6" style={{ color: player.color }} />,
+    <Club className="h-6 w-6" style={{ color: player.color }} />,
+    <Diamond className="h-6 w-6" style={{ color: player.color }} />,
+  ];
+
+  const effectiveMin = Math.min(minBet, player.chips);
+  const effectiveMax = Math.min(maxBet, player.chips);
+  const isAllInForced = player.chips < minBet && player.chips > 0;
+  
+  const quadrantDisabled = isDisabled || isEliminated || isLocked;
+
+  const handleBetClick = (amount) => {
+    let newBet;
+    if (amount === 'all') {
+      newBet = player.chips;
+    } else {
+      newBet = Math.min(player.chips, amount);
+    }
+    if (newBet < effectiveMin && newBet < player.chips) {
+      newBet = effectiveMin;
+    }
+    onBetChange(player.id, newBet);
+  };
+
+  const handleCustomBetChange = (e) => {
+    let newBet = parseInt(e.target.value, 10);
+    if (isNaN(newBet)) newBet = effectiveMin;
+    newBet = Math.max(effectiveMin, newBet);
+    newBet = Math.min(effectiveMax, newBet);
+    onBetChange(player.id, newBet);
+  };
+
+  // *** CẬP NHẬT: Bỏ viền màu và viền xanh lá khi chốt ***
+  return (
+    <div 
+      className={`p-4 rounded-lg border-4 bg-white shadow-md transition-all 
+                 ${isEliminated ? 'opacity-40 bg-stone-100' : ''} 
+                 ${isLocked ? 'shadow-lg' : ''} 
+                 border-stone-300`} // Viền xám mặc định, không thay đổi khi chốt
+    >
+      {/* Header (Tên vẫn có màu) */}
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-2xl font-bold" style={{ color: player.color }}>{player.name}</h3>
+        <span style={{ color: player.color }}>
+          {isLocked ? <Lock className="h-6 w-6 text-green-500" /> : playerIcons[player.id % 4]}
+        </span>
+      </div>
+
+      {/* Score */}
+      <div className="text-center bg-stone-100 p-3 rounded-lg mb-4 border border-stone-200">
+        <span className={`text-4xl font-bold ${isEliminated ? 'text-red-600' : 'text-green-700'}`}>
+          <DollarSign className="inline h-8 w-8" />
+          {isEliminated ? ' HẾT TIỀN' : ` ${player.chips}`}
+        </span>
+      </div>
+
+      {/* Betting Area */}
+      <div className="mb-4">
+        <div className="grid grid-cols-4 gap-2 mb-2">
+          <button onClick={() => handleBetClick(100)} disabled={quadrantDisabled || player.chips < 100} className="quiz-bet-button-light">100</button>
+          <button onClick={() => handleBetClick(500)} disabled={quadrantDisabled || player.chips < 500} className="quiz-bet-button-light">500</button>
+          <button onClick={() => handleBetClick(1000)} disabled={quadrantDisabled || player.chips < 1000} className="quiz-bet-button-light">1000</button>
+          <button onClick={() => handleBetClick('all')} disabled={quadrantDisabled} className="quiz-bet-button-light bg-red-500 text-white hover:bg-red-600">CƯỢC HẾT</button>
         </div>
-      );
-    })}
-  </div>
-);
+        <input 
+          type="number" 
+          value={bet} 
+          onChange={handleCustomBetChange} 
+          min={effectiveMin}
+          max={effectiveMax}
+          disabled={quadrantDisabled || isAllInForced}
+          className="w-full p-2 text-center font-bold text-lg bg-white text-stone-900 rounded border border-stone-300" 
+          placeholder="CƯỢC"
+        />
+        {isAllInForced && !isLocked && (
+            <p className="text-center text-red-500 text-xs mt-1">Phải cược tất cả!</p>
+        )}
+      </div>
 
-// Modal hiển thị kết quả
-const RevealModal = ({ results, correctAnswer, onNextQuestion }) => (
-  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-    <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-lg animate-fadeIn">
-      <h3 className="text-2xl font-bold mb-4 text-center">Kết Quả Vòng Này</h3>
-      <p className="text-center text-lg mb-4">
-        Đáp án đúng là: <strong className="text-green-700">{correctAnswer}</strong>
-      </p>
+      {/* Answer Area */}
+      <div className="grid grid-cols-4 gap-2 mb-4">
+        {['A', 'B', 'C', 'D'].map((opt, index) => (
+          <button 
+            key={opt}
+            onClick={() => onAnswerSelect(player.id, index)} 
+            disabled={quadrantDisabled}
+            className={`p-4 font-bold text-xl rounded transition-all border-2
+                        ${answerIndex === index ? 'bg-amber-400 border-amber-600 text-black scale-105 shadow-lg' : 'bg-stone-200 border-stone-300 hover:bg-stone-300 text-stone-800'}
+                        disabled:bg-stone-100 disabled:opacity-70 disabled:scale-100`}
+          >
+            {opt}
+          </button>
+        ))}
+      </div>
       
+      {/* Lock In Button */}
+      {!isLocked && !isEliminated && (
+        <button 
+          onClick={() => onLockIn(player.id)} 
+          disabled={quadrantDisabled || answerIndex === null || bet < effectiveMin} 
+          className="w-full p-3 bg-green-600 hover:bg-green-700 text-white font-bold text-xl rounded shadow-lg
+                     disabled:bg-stone-400 disabled:cursor-not-allowed"
+        >
+          <Lock className="inline h-5 w-5 mr-2" />
+          CHỐT
+        </button>
+      )}
+      
+      {/* Hiển thị khi đã chốt (không còn viền) */}
+      {isLocked && !isEliminated && (
+         <div className="w-full p-3 bg-green-100 text-green-800 font-bold text-xl rounded border-2 border-green-300 text-center">
+            <Check className="inline h-5 w-5 mr-2" />
+            ĐÃ CHỐT
+         </div>
+      )}
+
+    </div>
+  );
+};
+
+// --- Component 2: Modal Hiển thị Đáp án (Đây là phần bạn yêu cầu) ---
+const RevealModal = ({ results, correctAnswerText, onNextQuestion, answerOptions }) => (
+  <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div className="bg-white text-gray-900 p-6 rounded-lg shadow-xl w-full max-w-lg animate-fadeIn">
+      <h3 className="text-2xl font-bold mb-4 text-center">Kết Thúc Vòng</h3>
+      
+      {/* 1. Hiển thị đáp án đúng (theo yêu cầu) */}
+      <div className="space-y-2 mb-6">
+        <h4 className="text-xl font-bold mb-3 text-center text-stone-900 uppercase">Đáp án đúng:</h4>
+        {answerOptions.map((option, index) => (
+          <div 
+            key={index} 
+            className={`p-4 rounded-lg border-2 transition-all ${
+              option.text === correctAnswerText 
+                ? 'bg-green-500 border-green-600 shadow-lg scale-105' // Tô xanh đậm đáp án đúng
+                : 'bg-stone-100 border-stone-200 opacity-50' // Làm mờ đáp án sai
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className={`font-bold text-xl ${
+                  option.text === correctAnswerText ? 'text-white' : 'text-stone-700'
+                }`}>
+                  {String.fromCharCode(65 + index)}. 
+                </span>
+                <span className={`text-base ${option.text === correctAnswerText ? 'font-bold text-white' : 'text-stone-800'}`}>
+                  {option.text}
+                </span>
+              </div>
+              {option.text === correctAnswerText && (
+                <CheckCircle className="h-6 w-6 text-white flex-shrink-0" />
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <h4 className="text-lg font-bold mb-2 text-center text-stone-800">Kết quả các đội:</h4>
       <div className="space-y-3 max-h-60 overflow-y-auto pr-2">
         {results.map(res => (
           <div key={res.player.id} className="flex justify-between items-center p-3 rounded-lg"
                style={{ backgroundColor: res.isCorrect ? '#f0fdf4' : '#fef2f2' }}>
             <div>
-              <p className="font-bold">{res.player.name}</p>
+              <p className="font-bold" style={{color: res.player.color}}>{res.player.name}</p>
               <p className="text-sm">
                 Đã cược: <span className="font-semibold">${res.bet}</span> | 
-                Chọn: <span className="font-semibold">{res.answer || "(Bỏ lỡ)"}</span>
+                Chọn: <span className={`font-semibold ${res.answer ? (res.isCorrect ? 'text-green-700' : 'text-red-700') : 'text-gray-500 italic'}`}>
+                  {res.answer || "(Hết giờ/Bỏ lỡ)"}
+                </span>
               </p>
             </div>
             <div className={`font-bold text-lg ${res.isCorrect ? 'text-green-600' : 'text-red-600'}`}>
@@ -56,6 +187,7 @@ const RevealModal = ({ results, correctAnswer, onNextQuestion }) => (
         ))}
       </div>
       
+      {/* 2. Nút "Câu hỏi tiếp theo" (theo yêu cầu) */}
       <button
         onClick={onNextQuestion}
         className="w-full flex items-center justify-center px-6 py-3 bg-amber-800 text-white font-bold rounded-lg shadow-md hover:bg-amber-900 mt-6"
@@ -67,105 +199,125 @@ const RevealModal = ({ results, correctAnswer, onNextQuestion }) => (
   </div>
 );
 
-const QuizActive = ({ questions, players, setPlayers, onEndQuiz }) => {
+
+// --- Component 3: Màn hình chơi chính (Logic chính) ---
+const QuizActive = ({ questions, players, setPlayers, onEndQuiz, minBet, maxBet, timePerQuestion }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0); // Index trong mảng activePlayers
-  const [playerInputs, setPlayerInputs] = useState({}); // { playerId: { bet: 10, answer: null } }
-  const [lockedPlayers, setLockedPlayers] = useState(new Set());
   const [viewState, setViewState] = useState('betting'); // 'betting', 'reveal'
-  const [results, setResults] = useState([]); // [ { player, bet, answer, isCorrect }, ... ]
+  const [results, setResults] = useState([]);
+  const [playerInputs, setPlayerInputs] = useState({});
+  const [timer, setTimer] = useState(timePerQuestion);
 
   const currentQuestion = questions[currentQuestionIndex];
-  
-  // Chỉ những người chơi còn chip mới được chơi
   const activePlayers = useMemo(() => players.filter(p => p.chips > 0), [players]);
-  const currentPlayer = activePlayers[currentPlayerIndex];
 
   // Reset state cho câu hỏi mới
   useEffect(() => {
     setViewState('betting');
-    setLockedPlayers(new Set());
     setResults([]);
-    setCurrentPlayerIndex(0);
-    // Đặt cược và câu trả lời mặc định cho tất cả người chơi CÒN TIỀN
-    setPlayerInputs(activePlayers.reduce((acc, p) => {
-      acc[p.id] = { bet: 10, answer: null };
+    setTimer(timePerQuestion);
+    setPlayerInputs(players.reduce((acc, p) => {
+      const effectiveMin = Math.min(minBet, p.chips);
+      acc[p.id] = { 
+        bet: p.chips > 0 ? effectiveMin : 0, 
+        answerIndex: null, answerText: null,
+        isLocked: p.chips <= 0
+      };
       return acc;
     }, {}));
-  }, [currentQuestionIndex, activePlayers.length]); // Chạy lại nếu số người chơi active thay đổi
+  }, [currentQuestionIndex, players, minBet, timePerQuestion]);
 
-  if (!currentPlayer || !currentQuestion) {
-    // Trường hợp không còn người chơi hoặc câu hỏi
-    return <div>Đang tải...</div>;
-  }
-  
-  const currentBet = playerInputs[currentPlayer.id]?.bet || 10;
-  const currentAnswer = playerInputs[currentPlayer.id]?.answer || null;
-
-  const handleBetChange = (e) => {
-    let newBet = parseInt(e.target.value, 10);
-    if (isNaN(newBet) || newBet < 1) newBet = 1;
-    if (newBet > currentPlayer.chips) newBet = currentPlayer.chips;
-    
-    setPlayerInputs(prev => ({
-      ...prev,
-      [currentPlayer.id]: { ...prev[currentPlayer.id], bet: newBet }
-    }));
-  };
-
-  const handleAnswerSelect = (answerText) => {
-    setPlayerInputs(prev => ({
-      ...prev,
-      [currentPlayer.id]: { ...prev[currentPlayer.id], answer: answerText }
-    }));
-  };
-
-  const handleLockIn = () => {
-    if (!currentAnswer) {
-      alert('Bạn phải chọn một đáp án!');
+  // Logic Timer
+  useEffect(() => {
+    if (viewState !== 'betting') return;
+    if (timer <= 0) {
+      autoLockAll();
       return;
     }
-    
-    const newLockedPlayers = new Set(lockedPlayers).add(currentPlayer.id);
-    setLockedPlayers(newLockedPlayers);
-
-    // Kiểm tra xem tất cả người chơi active đã chốt chưa
-    if (newLockedPlayers.size === activePlayers.length) {
-      // TẤT CẢ ĐÃ CHỐT -> CHUYỂN SANG VIEW REVEAL
-      calculateResults();
-      setViewState('reveal');
-    } else {
-      // Chuyển sang người chơi tiếp theo
-      setCurrentPlayerIndex((currentPlayerIndex + 1) % activePlayers.length);
-    }
-  };
+    const interval = setInterval(() => setTimer(t => t - 1), 1000);
+    return () => clearInterval(interval);
+  }, [timer, viewState]);
   
+  // Xử lý inputs
+  const handleBetChange = (playerId, newBet) => {
+    setPlayerInputs(prev => ({
+      ...prev, [playerId]: { ...prev[playerId], bet: newBet }
+    }));
+  };
+  const handleAnswerSelect = (playerId, answerIndex) => {
+    const answerText = currentQuestion.answerOptions[answerIndex].text;
+    setPlayerInputs(prev => ({
+      ...prev, [playerId]: { ...prev[playerId], answerIndex, answerText }
+    }));
+  };
+  const handleLockIn = (playerId, isAutoLock = false) => {
+    const player = players.find(p => p.id === playerId);
+    const input = playerInputs[playerId];
+    if (isAutoLock) {
+        // Hết giờ, chỉ khóa lại
+    } else {
+      // Người dùng tự chốt, kiểm tra logic
+      if (player.chips >= minBet && input.bet < minBet) {
+        alert(`Bạn phải cược ít nhất ${minBet} chip!`); return;
+      }
+      if (player.chips < minBet && input.bet !== player.chips) {
+        alert(`Bạn có quá ít chip. Bạn phải cược tất cả ${player.chips} chip!`);
+        handleBetChange(playerId, player.chips);
+      }
+      if (input.answerIndex === null) {
+        alert('Bạn phải chọn một đáp án!'); return;
+      }
+    }
+    setPlayerInputs(prev => ({
+      ...prev, [playerId]: { ...prev[playerId], isLocked: true }
+    }));
+  };
+
+  // Tự động khóa khi hết giờ
+  const autoLockAll = () => {
+    activePlayers.forEach(p => {
+      if (!playerInputs[p.id]?.isLocked) {
+        handleLockIn(p.id, true); // true = auto-lock
+      }
+    });
+  };
+
+  // Chuyển sang 'reveal' khi tất cả đã khóa
+  useEffect(() => {
+    if (viewState !== 'betting' || activePlayers.length === 0) return;
+    const allActivePlayersLocked = activePlayers.every(p => playerInputs[p.id]?.isLocked);
+    
+    // Đây là logic kích hoạt Modal (theo yêu cầu)
+    if (allActivePlayersLocked) {
+      setTimer(0);
+      setTimeout(() => {
+        calculateResults();
+        setViewState('reveal'); // Kích hoạt Modal
+      }, 1000); 
+    }
+  }, [playerInputs, activePlayers, viewState]);
+  
+  // Tính kết quả
   const calculateResults = () => {
     const roundResults = [];
     let updatedPlayers = [...players];
     
     for (const player of activePlayers) {
       const input = playerInputs[player.id];
-      const isCorrect = input.answer === currentQuestion.correctAnswer;
+      const isCorrect = input.answerText === currentQuestion.correctAnswer;
       const chipChange = isCorrect ? input.bet : -input.bet;
       
-      roundResults.push({
-        player,
-        bet: input.bet,
-        answer: input.answer,
-        isCorrect: isCorrect,
-      });
+      roundResults.push({ player, bet: input.bet, answer: input.answerText, isCorrect });
       
-      // Cập nhật chip cho người chơi
       updatedPlayers = updatedPlayers.map(p => 
         p.id === player.id ? { ...p, chips: Math.max(0, p.chips + chipChange) } : p
       );
     }
-    
     setResults(roundResults);
-    setPlayers(updatedPlayers); // Cập nhật state chip của tất cả người chơi
+    setPlayers(updatedPlayers);
   };
 
+  // Qua câu tiếp theo (được gọi từ Modal)
   const handleNextQuestion = () => {
     const nextQuestionIndex = currentQuestionIndex + 1;
     const remainingPlayers = players.filter(p => p.chips > 0).length;
@@ -174,95 +326,79 @@ const QuizActive = ({ questions, players, setPlayers, onEndQuiz }) => {
       onEndQuiz();
     } else {
       setCurrentQuestionIndex(nextQuestionIndex);
-      // useEffect sẽ xử lý việc reset state
     }
   };
 
-  const progressPercentage = ((currentQuestionIndex + 1) / questions.length) * 100;
+  const timerColor = timer <= 10 ? 'text-red-500' : 'text-stone-800';
+  const timerBarWidth = (timer / timePerQuestion) * 100;
 
   return (
     <div className="w-full transition-all duration-300 ease-in-out">
+      {/* Modal sẽ hiển thị khi viewState === 'reveal' */}
       {viewState === 'reveal' && (
         <RevealModal 
           results={results} 
-          correctAnswer={currentQuestion.correctAnswer}
+          correctAnswerText={currentQuestion.correctAnswer}
+          answerOptions={currentQuestion.answerOptions}
           onNextQuestion={handleNextQuestion} 
         />
       )}
 
-      {/* Header: Tiến độ và Trạng thái người chơi */}
+      {/* Header: Câu hỏi và Timer */}
       <div className="mb-6">
-        <p className="text-sm font-medium text-stone-600 text-center mb-2">
-          Câu hỏi {currentQuestionIndex + 1} / {questions.length}
-        </p>
+        <div className="flex justify-between items-center mb-2">
+           <p className="text-sm font-medium text-stone-600">
+            Câu hỏi {currentQuestionIndex + 1} / {questions.length}
+          </p>
+          <div className={`text-3xl font-bold font-mono ${timerColor} flex items-center`}>
+            <Clock className="h-6 w-6 mr-2" />
+            {timer}
+          </div>
+        </div>
+        
         <div className="w-full bg-stone-200 rounded-full h-2.5 mb-4">
           <div 
-            className="bg-amber-700 h-2.5 rounded-full" 
-            style={{ width: `${progressPercentage}%` }}
+            className={`h-2.5 rounded-full transition-all duration-1000 ease-linear ${timer <= 10 ? 'bg-red-500' : 'bg-amber-500'}`}
+            style={{ width: `${timerBarWidth}%` }}
           ></div>
         </div>
-        <PlayerStatus 
-          players={players} 
-          lockedPlayers={lockedPlayers} 
-          currentPlayerId={currentPlayer.id} 
-        />
-      </div>
-      
-      {/* Câu hỏi và Lượt */}
-      <h3 className="text-xl font-semibold text-center text-amber-900 mb-4">
-        Lượt của: {currentPlayer.name}
-      </h3>
-      <h2 className="text-2xl font-semibold text-stone-900 mb-6 text-center leading-relaxed">
-        {currentQuestion.question}
-      </h2>
-      
-      {/* Đặt cược */}
-      <div className="flex items-center gap-3 max-w-sm mx-auto mb-6">
-        <label htmlFor="bet" className="font-medium text-stone-700">
-          <DollarSign className="mr-1 h-5 w-5 inline-block" />
-          Đặt cược:
-        </label>
-        <input
-          id="bet"
-          type="number"
-          value={currentBet}
-          onChange={handleBetChange}
-          min="1"
-          max={currentPlayer.chips}
-          className="w-full p-2 border border-stone-300 rounded-md text-lg font-bold"
-        />
+        
+        <h2 className="text-2xl md:text-3xl font-semibold text-stone-900 mb-6 text-center leading-relaxed">
+          {currentQuestion.question}
+        </h2>
       </div>
 
-      {/* Các lựa chọn */}
-      <div className="space-y-3">
-        {currentQuestion.answerOptions.map((option, index) => (
-          <button
-            key={index}
-            onClick={() => handleAnswerSelect(option.text)}
-            className={`w-full text-left p-4 rounded-lg border-2
-                       transition-all duration-200 transform 
-                       ${currentAnswer === option.text
-                         ? 'bg-amber-200 border-amber-500 shadow-md scale-105'
-                         : 'bg-stone-50 border-stone-200 hover:bg-amber-100 hover:border-amber-400'
-                       }`}
-          >
-            <span className="text-base text-stone-800">{String.fromCharCode(65 + index)}. </span>
-            <span className="text-base text-stone-800">{option.text}</span>
-          </button>
+      {/* 2x2 Grid cho người chơi */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {players.map(player => (
+          <PlayerQuadrant 
+            key={player.id}
+            player={player}
+            input={playerInputs[player.id] || { bet: 0, answerIndex: null, isLocked: true }}
+            onBetChange={handleBetChange}
+            onAnswerSelect={handleAnswerSelect}
+            onLockIn={handleLockIn}
+            minBet={minBet}
+            maxBet={maxBet}
+            isDisabled={playerInputs[player.id]?.isLocked || viewState === 'reveal'}
+          />
         ))}
+        {/* Thêm các ô trống nếu ít hơn 4 người chơi */}
+        {players.length < 4 && <div className="hidden md:block rounded-lg border-4 border-dashed border-stone-300 bg-stone-100 min-h-[360px]"></div>}
+        {players.length < 3 && <div className="hidden md:block rounded-lg border-4 border-dashed border-stone-300 bg-stone-100 min-h-[360px]"></div>}
       </div>
 
-      {/* Nút Chốt */}
-      <div className="flex justify-center mt-8">
-        <button
-          onClick={handleLockIn}
-          disabled={!currentAnswer}
-          className="px-10 py-3 bg-green-600 text-white font-bold rounded-lg shadow hover:bg-green-700
-                     disabled:bg-stone-400 disabled:cursor-not-allowed"
-        >
-          <Lock className="mr-2 h-5 w-5 inline-block" />
-          Chốt!
-        </button>
+      {/* Hiển thị các đáp án */}
+      <div className="mt-8 p-4 bg-white border border-stone-200 rounded-lg shadow-sm">
+        <h3 className="text-lg font-bold text-stone-800 text-center mb-3">CÁC LỰA CHỌN ĐÁP ÁN</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {currentQuestion.answerOptions.map((option, index) => (
+            <div key={index} className="p-3 bg-stone-100 border border-stone-200 rounded">
+              <span className="font-bold text-amber-700 text-lg">{String.fromCharCode(65 + index)}. </span>
+              <span className="text-stone-800 text-base">{option.text}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
