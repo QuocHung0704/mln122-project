@@ -111,7 +111,7 @@ const RightPanel: React.FC<RightPanelProps> = (props) => {
          <aside id="right-panel" className="lg:h-full pixel-panel p-4 flex flex-col gap-4">
             <div className="flex items-center justify-between">
                 <h2 className="font-pixel text-2xl text-center font-bold">
-                    Vòng {props.round}/10
+                    Vòng {props.round}/6
                 </h2>
                 <div className="flex items-center gap-2">
                     <button onClick={props.onToggleView} title="Toggle View" className="w-10 h-10 pixel-button-color bg-indigo-500 flex items-center justify-center font-pixel text-xs text-white">

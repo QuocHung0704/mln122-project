@@ -14,7 +14,7 @@ const RulesModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 </div>
                 <div className="p-6 overflow-y-auto max-h-[70vh] bg-white">
                     <h3 className="font-bold text-lg mb-2">Mục Tiêu</h3>
-                    <p className="mb-4 text-sm">Trở thành người chơi có nhiều Chip nhất sau 10 vòng chơi.</p>
+                    <p className="mb-4 text-sm">Trở thành người chơi có nhiều Chip nhất sau 6 vòng chơi.</p>
 
                     <h3 className="font-bold text-lg mb-2">Cách Chơi</h3>
                     <ul className="list-disc list-inside space-y-2 text-sm">

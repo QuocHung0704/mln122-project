@@ -54,7 +54,7 @@ export interface TutorialStep {
     },
     {
       title: 'Chúc May Mắn!',
-      content: 'Đó là những điều cơ bản! Tích lũy nhiều vốn nhất sau 10 vòng để giành chiến thắng. Chúc may mắn, nhà tư bản!',
+      content: 'Đó là những điều cơ bản! Tích lũy nhiều vốn nhất sau 6 vòng để giành chiến thắng. Chúc may mắn, nhà tư bản!',
     },
   ];
   

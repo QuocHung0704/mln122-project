@@ -12,7 +12,7 @@ const Header = ({ activeSection, setActiveSection }) => {
       <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           {/* Tiêu đề trang */}
-          <a href="QuizGame">
+          <a href="">
           <div className="flex-shrink-0 flex items-center">           
             {/* THAY ĐỔI Ở ĐÂY: Tăng kích cỡ logo lên h-20 w-20 */}
             <img 
