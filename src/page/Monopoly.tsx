@@ -446,9 +446,9 @@ const App: React.FC = () => {
 
         if (nextPlayerIndex === 0) {
             const nextRound = round + 1;
-            if (nextRound > 10) {
+            if (nextRound > 6) {
                 setGamePhase(GamePhase.GAME_OVER);
-                addLog("Hết 10 vòng! Trò chơi kết thúc!");
+                addLog("Hết 6 vòng! Trò chơi kết thúc!");
                 return;
             }
             setRound(nextRound);
