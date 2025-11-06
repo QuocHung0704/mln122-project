@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Square, Player, CasinoBetResult } from '../../types/type';
+import { Square, Player, CasinoBetResult } from '../types';
 
 // Dice sub-component remains the same
 const Dice: React.FC<{ value: number }> = ({ value }) => {

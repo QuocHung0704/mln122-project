@@ -19,7 +19,7 @@ const GameLog: React.FC<GameLogProps> = ({ log }) => {
                     SỰ KIỆN
                 </div>
             </div>
-            <div className="flex-grow pixel-panel-inset p-2 overflow-y-auto flex flex-col-reverse bg-white border-4 border-black">
+            <div className="h-64 lg:flex-grow lg:min-h-0 pixel-panel-inset p-2 overflow-y-auto flex flex-col-reverse bg-white border-4 border-black">
                  <ul className="space-y-1 text-xs p-1">
                     {log.map((entry, index) => (
                         <li key={index} className={`transition-opacity duration-300 ${getEventEntryStyle(entry)}`}>

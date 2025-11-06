@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import { Player, Square, SquareType } from '../../types/type';
 import SquareIcon from './SquareIcon';
@@ -176,16 +174,14 @@ const GameBoard: React.FC<GameBoardProps> = ({ players, productionFeedback, curr
             style={boardStyle}
         >
             <div className="relative w-full h-full">
-                {/* Centerpiece */}
+                {/* Centerpiece - ĐÃ SỬA ĐỔI */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[72%] h-[72%] border-4 border-black bg-[#166534] rounded-full flex flex-col items-center justify-center p-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-yellow-300/80 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9 9 0 100-18 9 9 0 000 18z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m8-9h-1m-16 0H3m15.364-6.364l-.707.707M5.343 18.657l-.707.707m12.728 0l-.707-.707M6.05 6.05l-.707-.707" />
-                    </svg>
-                    <h1 className="text-4xl lg:text-5xl font-pixel text-white text-center leading-tight text-shadow">
-                        CỜ CÔNG DÂN
-                    </h1>
+                    {/* XÓA SVG VÀ H1, THAY BẰNG IMG */}
+                    <img 
+                        src="/public/assets/CCD-06.png" 
+                        alt="Logo Cờ Công Dân" 
+                        className="max-w-[80%] max-h-[80%] object-contain" 
+                    />
                 </div>
 
                 {/* Squares rendered on the circumference */}

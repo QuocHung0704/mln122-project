@@ -79,16 +79,22 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
   );
 
   // ✅ return nằm ở thân chính của component
+  // THAY ĐỔI: Chỉnh sửa các lớp CSS của div gốc
+  // min-h-screen -> h-full (để vừa với layout cha)
+  // w-screen -> w-full (để vừa với layout cha)
+  // justify-center -> justify-start (để nội dung bắt đầu từ trên)
+  // Thêm overflow-y-auto (để tự cuộn khi nội dung quá dài)
   return (
-    <div className="min-h-screen w-screen p-4 flex flex-col items-center justify-center gap-8">
+    <div className="h-full w-full p-4 flex flex-col items-center justify-start gap-8 overflow-y-auto">
       <h1
-        className="text-4xl md:text-5xl font-pixel text-black text-center leading-tight"
+        className="text-4xl md:text-5xl font-pixel text-black text-center leading-tight pt-4" // Thêm pt-4 để không bị dính sát lề
         style={{ textShadow: '4px 4px 0 #fff, 8px 8px 0 #000' }}
       >
         CỜ CÔNG DÂN
       </h1>
 
-      <main className="pixel-panel p-6 flex flex-col items-center gap-6 w-full max-w-2xl">
+      {/* Thêm flex-shrink-0 để panel chính không bị co lại khi màn hình hẹp */}
+      <main className="pixel-panel p-6 flex flex-col items-center gap-6 w-full max-w-2xl flex-shrink-0">
         <div>
           <h2 className="text-xl font-pixel text-center">CHỌN SỐ NGƯỜI CHƠI</h2>
           <div className="flex justify-center gap-4 mt-4">
@@ -176,6 +182,9 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
           BẮT ĐẦU!
         </button>
       </main>
+      
+      {/* Thêm một khoảng đệm ở dưới để cuộn đẹp hơn */}
+      <div className="h-8 flex-shrink-0"></div>
     </div>
   );
 };

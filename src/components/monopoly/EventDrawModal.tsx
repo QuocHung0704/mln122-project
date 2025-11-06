@@ -11,7 +11,7 @@ const EventDrawModal: React.FC<EventDrawModalProps> = ({ event, squareSubType, o
     const [isFlipped, setIsFlipped] = useState(false);
     const [showButton, setShowButton] = useState(false);
 
-    const cardBackClass = squareSubType === 'thoi_cuoc' ? 'bg-yellow-400' : 'bg-red-500';
+    const cardBackClass = squareSubType === 'thoi_cuoc' ? 'bg-yellow-400' : 'bg-green-500';
     const cardFrontClass = 'bg-white';
     const cardTitle = squareSubType === 'thoi_cuoc' ? 'THỜI CUỘC' : 'VẬN MỆNH';
 
@@ -36,8 +36,7 @@ const EventDrawModal: React.FC<EventDrawModalProps> = ({ event, squareSubType, o
                 {/* Card Element */}
                 <div className="w-full h-80 perspective-1000">
                     <div className={`card-inner ${isFlipped ? 'is-flipped' : ''}`}>
-                        {/* Card Back */}
-                        <div className={`card-face card-back pixel-panel flex flex-col items-center justify-center p-6 text-center ${cardBackClass}`}>
+                        <div className={`card-face card-back border-4 border-black flex flex-col items-center justify-center p-6 text-center ${cardBackClass}`}>
                             <h2 className="text-3xl font-pixel text-white text-shadow">{cardTitle}</h2>
                             <div className="text-8xl my-4 text-white text-shadow">?</div>
                         </div>

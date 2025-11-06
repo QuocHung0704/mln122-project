@@ -85,3 +85,107 @@ body {
 .animate-player-bob {
   animation: player-bob 1.5s ease-in-out infinite;
 }
+
+ /* Animations */
+ @keyframes fade-up-out {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-20px); opacity: 0; }
+}
+.animate-fade-up-out { animation: fade-up-out 1.5s ease-out forwards; }
+
+@keyframes ping-fade-out {
+  0% { transform: translate(-50%, -50%) scale(0.8); opacity: 1; }
+  100% { transform: translate(-50%, -200%) scale(1.5); opacity: 0; }
+}
+.animate-ping-fade-out { animation: ping-fade-out 1.5s ease-out forwards; }
+
+@keyframes player-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+.animate-player-bob { animation: player-bob 1.5s ease-in-out infinite; }
+
+@keyframes current-player-glow {
+  0%, 100% { box-shadow: 0 0 12px 4px var(--color-accent-glow), inset 0 0 4px 2px var(--color-accent-glow); }
+  50% { box-shadow: 0 0 20px 8px var(--color-accent-glow), inset 0 0 6px 3px var(--color-accent-glow); }
+}
+.current-player-highlight {
+  animation: current-player-glow 2.5s ease-in-out infinite;
+}
+
+@keyframes text-glow {
+  0%, 100% { text-shadow: 0 0 4px #fff, 0 0 8px #fff, 0 0 12px var(--color-accent-glow), 0 0 16px var(--color-accent-glow); }
+  50% { text-shadow: 0 0 8px #fff, 0 0 12px #fff, 0 0 20px var(--color-accent-glow), 0 0 24px var(--color-accent-glow); }
+}
+.animate-text-glow { animation: text-glow 2s ease-in-out infinite; }
+
+@keyframes scale-in {
+  0% { opacity: 0; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.animate-scale-in { animation: scale-in 0.2s ease-out forwards; }
+
+@keyframes jackpot-glow {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); text-shadow: 2px 2px 0 #000, 0 0 8px #fff, 0 0 12px var(--color-accent-glow); }
+  100% { transform: scale(1); }
+}
+.animate-jackpot-glow { animation: jackpot-glow 0.5s ease-out; }
+
+/* Card Flip Animation */
+.perspective-1000 { perspective: 1000px; }
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+}
+.card-inner.is-flipped {
+  transform: rotateY(180deg);
+}
+.card-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  border-radius: 0.5rem;
+}
+.card-front {
+  transform: rotateY(180deg);
+}
+
+/* Casino Enhancements */
+@keyframes casino-glow {
+  0%, 100% { border-color: #f9a8d4; box-shadow: 0 0 8px 3px rgba(236, 72, 153, 0.7), inset 0 0 6px 2px rgba(236, 72, 153, 0.7); }
+  50% { border-color: #ec4899; box-shadow: 0 0 16px 6px rgba(236, 72, 153, 1), inset 0 0 10px 4px rgba(236, 72, 153, 1); }
+}
+
+@keyframes sparkle {
+  0%, 100% { transform: scale(0.5); opacity: 0.5; }
+  50% { transform: scale(1.2); opacity: 1; }
+}
+
+
+/* Responsive Layout */
+@media (max-width: 1024px) {
+  body {
+    overflow: auto;
+  }
+  #app-container {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+  }
+  main {
+    order: 1;
+  }
+  #player-info-panel {
+    order: 2;
+    max-height: 400px; /* Limit height */
+  }
+  #right-panel {
+    order: 3;
+  }
+}
