@@ -42,9 +42,10 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
   };
 
   const handleCharacterChange = (index: number, characterId: string) => {
-    if (playerCharacters.includes(characterId) && playerCharacters[index] !== characterId) {
-      return;
-    }
+    // SỬA LỖI: Xóa bỏ logic kiểm tra trùng lặp để cho phép chọn trùng
+    // if (playerCharacters.includes(characterId) && playerCharacters[index] !== characterId) {
+    //   return;
+    // }
 
     const newCharacters = [...playerCharacters];
     newCharacters[index] = newCharacters[index] === characterId ? '' : characterId;
@@ -52,10 +53,11 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
   };
 
   const handleStartClick = () => {
-    // SỬA LẠI LOGIC NÀY
+    // SỬA LỖI: Gán các icon mặc định khác nhau
+    const defaultIcons = ['♟️', '♝', '♞', '♜']; // Các icon mặc định
     const finalPlayerConfigs = playerCharacters.map((charId, index) => {
       const character = CHARACTER_MAP[charId];
-      const defaultIcon = '♟️'; // Emoji mặc định nếu không chọn
+      const defaultIcon = defaultIcons[index]; // Lấy icon mặc định theo thứ tự
       return {
         name: playerNames[index].trim() === '' ? `Đội ${index + 1}` : playerNames[index].trim(),
         // Lấy icon từ character, nếu không có thì dùng defaultIcon
@@ -131,18 +133,19 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStartGame }) => {
                 <div className="w-full grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {CHARACTERS.map((char) => {
                     const isSelected = playerCharacters[index] === char.id;
-                    const isTaken = playerCharacters.includes(char.id) && !isSelected;
+                    // SỬA LỖI: Xóa bỏ logic isTaken
+                    // const isTaken = playerCharacters.includes(char.id) && !isSelected;
 
                     return (
                       <button
                         key={char.id}
                         onClick={() => handleCharacterChange(index, char.id)}
-                        disabled={isTaken}
+                        // disabled={isTaken} // Bỏ disabled
                         className={`p-1 rounded-md transition-all duration-150 ${
                           isSelected
                             ? 'border-4 border-yellow-400 transform scale-105 shadow-lg'
                             : 'border-4 border-transparent'
-                        } ${isTaken ? 'opacity-40 cursor-not-allowed' : 'hover:border-yellow-200'}`}
+                        } hover:border-yellow-200`} // Bỏ logic isTaken
                       >
                         <img
                           src={char.cardImg}

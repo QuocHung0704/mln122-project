@@ -82,9 +82,16 @@ const App: React.FC = () => {
         setLog(prev => [message, ...prev.slice(0, 49)]);
     }, []);
 
-    const updatePlayerState = useCallback((playerId: number, updates: Partial<Player>) => {
+    // SỬA LỖI: Cho phép updatePlayerState nhận một hàm updater
+    const updatePlayerState = useCallback((playerId: number, updates: Partial<Player> | ((player: Player) => Partial<Player>)) => {
         setPlayers(prevPlayers =>
-            prevPlayers.map(p => (p.id === playerId ? { ...p, ...updates } : p))
+            prevPlayers.map(p => {
+                if (p.id === playerId) {
+                    const newUpdates = typeof updates === 'function' ? updates(p) : updates;
+                    return { ...p, ...newUpdates };
+                }
+                return p;
+            })
         );
     }, []);
 
@@ -503,16 +510,17 @@ const App: React.FC = () => {
         setGamePhase(GamePhase.END_TURN);
     }
     
+    // SỬA LỖI: Dùng hàm updater cho updatePlayerState
     const handleDrawnEventResolve = () => {
         const player = players[currentPlayerIndex];
         if (!currentEvent) return;
          let logMessage = `Sự kiện: ${currentEvent.title}`;
          switch (currentEvent.effectType) {
             case EffectType.GAIN_CHIPS:
-                updatePlayerState(player.id, { chips: player.chips + currentEvent.value });
+                updatePlayerState(player.id, (p) => ({ chips: p.chips + currentEvent.value }));
                 break;
             case EffectType.LOSE_CHIPS:
-                updatePlayerState(player.id, { chips: Math.max(0, player.chips - currentEvent.value) });
+                updatePlayerState(player.id, (p) => ({ chips: Math.max(0, p.chips - currentEvent.value) }));
                 break;
             case EffectType.MISS_TURN:
                 updatePlayerState(player.id, { missNextTurn: true });
